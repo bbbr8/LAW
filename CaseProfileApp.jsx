@@ -8,20 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Plus, FileText, Upload, Trash2, Info, ChevronLeft, ChevronRight, CheckCircle2, Tags } from "lucide-react";
-
-const STORAGE_KEY = "bj_case_profiles_v1";
-const loadCases = () => {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
-};
-const saveCase = (rec) => {
-  const all = loadCases();
-  all.unshift(rec);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-};
+import useCaseStorage from "./hooks/useCaseStorage";
 
 function CaseLandingPage({ onNew, onOpen }) {
+  const { loadCases } = useCaseStorage();
   const [cases, setCases] = useState([]);
-  useEffect(() => { setCases(loadCases()); }, []);
+  useEffect(() => { setCases(loadCases()); }, [loadCases]);
   return (
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="flex justify-between items-center mb-6">
@@ -76,6 +68,7 @@ function CaseDetail({ caseData, onBack }) {
 }
 
 function CaseProfileCreator({ onSaved, onCancel }) {
+  const { saveCase } = useCaseStorage();
   const [step, setStep] = useState(1);
   const [busy, setBusy] = useState(false);
   const inputRef = useRef(null);
