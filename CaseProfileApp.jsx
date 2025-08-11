@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Plus, FileText, Upload, Trash2, Info, ChevronLeft, ChevronRight, CheckCircle2, Tags } from "lucide-react";
+import { addMessage, getMessages } from "./backend/messages";
+import { addTask, getTasks } from "./backend/tasks";
 
 const STORAGE_KEY = "bj_case_profiles_v1";
 const loadCases = () => {
@@ -52,7 +54,31 @@ function CaseLandingPage({ onNew, onOpen }) {
   );
 }
 
-function CaseDetail({ caseData, onBack }) {
+function CaseDetail({ caseData, onBack, role = "lawyer" }) {
+  const [messages, setMessages] = useState(() => getMessages(caseData.id, role));
+  const [newMsg, setNewMsg] = useState("");
+  const [internal, setInternal] = useState(false);
+
+  const sendMessage = () => {
+    if (!newMsg.trim()) return;
+    addMessage(caseData.id, { text: newMsg, author: role, internal });
+    setMessages(getMessages(caseData.id, role));
+    setNewMsg("");
+    setInternal(false);
+  };
+
+  const [tasks, setTasks] = useState(() => getTasks(caseData.id));
+  const [taskText, setTaskText] = useState("");
+  const [taskDue, setTaskDue] = useState("");
+
+  const addNewTask = () => {
+    if (!taskText || !taskDue) return;
+    addTask(caseData.id, { text: taskText, dueAt: taskDue, assignedTo: role });
+    setTasks(getTasks(caseData.id));
+    setTaskText("");
+    setTaskDue("");
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 p-8">
       <Button variant="outline" onClick={onBack} className="mb-6">← Back</Button>
@@ -71,6 +97,42 @@ function CaseDetail({ caseData, onBack }) {
       ) : (
         <p>No parties listed.</p>
       )}
+
+      <h2 className="text-xl font-semibold mt-8 mb-2">Messages</h2>
+      <div className="rounded-2xl border bg-white p-4 mb-6">
+        <div className="space-y-2 max-h-60 overflow-y-auto mb-4">
+          {messages.map((m) => (
+            <div key={m.id} className="text-sm">
+              <strong>{m.author}</strong>: {m.text}
+              {m.internal && <span className="text-red-500 ml-2">(internal)</span>}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-2">
+          <Input value={newMsg} onChange={(e)=>setNewMsg(e.target.value)} placeholder="Type message" />
+          <div className="flex items-center gap-1">
+            <Switch checked={internal} onCheckedChange={setInternal} />
+            <span className="text-xs">Internal</span>
+          </div>
+          <Button onClick={sendMessage}>Send</Button>
+        </div>
+      </div>
+
+      <h2 className="text-xl font-semibold mt-8 mb-2">Tasks</h2>
+      <div className="rounded-2xl border bg-white p-4">
+        <div className="space-y-2 mb-4">
+          {tasks.map((t) => (
+            <div key={t.id} className="text-sm">
+              {t.text} – due {t.dueAt}
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+          <Input value={taskText} onChange={(e)=>setTaskText(e.target.value)} placeholder="Task description" />
+          <Input type="date" value={taskDue} onChange={(e)=>setTaskDue(e.target.value)} />
+          <Button onClick={addNewTask}>Add Task</Button>
+        </div>
+      </div>
     </div>
   );
 }
