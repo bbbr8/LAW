@@ -10,6 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import { Plus, FileText, Upload, Trash2, Info, ChevronLeft, ChevronRight, CheckCircle2, Tags } from "lucide-react";
 
 const STORAGE_KEY = "bj_case_profiles_v1";
+const ACCEPTED_TYPES = ["application/pdf", "image/png", "image/jpeg"];
+const SCAN_ENDPOINT = "/api/scan-upload";
 const loadCases = () => {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
 };
@@ -78,6 +80,8 @@ function CaseDetail({ caseData, onBack }) {
 function CaseProfileCreator({ onSaved, onCancel }) {
   const [step, setStep] = useState(1);
   const [busy, setBusy] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadErrors, setUploadErrors] = useState([]);
   const inputRef = useRef(null);
   const [draft, setDraft] = useState({
     caseName: "",
@@ -99,7 +103,41 @@ function CaseProfileCreator({ onSaved, onCancel }) {
   }, [step, draft.caseName]);
   const update = (key, value) => setDraft((d) => ({ ...d, [key]: value }));
   const onPickFiles = () => inputRef.current?.click();
-  const onFilesSelected = (files) => { if (!files) return; update("files", [...draft.files, ...Array.from(files)]); };
+  const onFilesSelected = async (files) => {
+    if (!files) return;
+    const incoming = Array.from(files);
+    const errors = [];
+    const valid = incoming.filter((f) => {
+      const ok = ACCEPTED_TYPES.includes(f.type);
+      if (!ok) errors.push(`${f.name}: unsupported file type`);
+      return ok;
+    });
+    if (!valid.length) {
+      setUploadErrors(errors);
+      return;
+    }
+    setUploading(true);
+    setUploadErrors([]);
+    const safe = [];
+    for (const file of valid) {
+      const fd = new FormData();
+      fd.append("file", file);
+      try {
+        const res = await fetch(SCAN_ENDPOINT, { method: "POST", body: fd });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data?.safe) {
+          safe.push(file);
+        } else {
+          errors.push(`${file.name}: ${data?.message || "infected file"}`);
+        }
+      } catch {
+        errors.push(`${file.name}: upload failed`);
+      }
+    }
+    if (safe.length) update("files", [...draft.files, ...safe]);
+    if (errors.length) setUploadErrors(errors);
+    setUploading(false);
+  };
   const onDrop = (e) => { e.preventDefault(); if (e.dataTransfer.files?.length) onFilesSelected(e.dataTransfer.files); };
   const removeFile = (idx) => update("files", draft.files.filter((_, i) => i !== idx));
   const analyzeUploads = async () => {
@@ -206,9 +244,10 @@ function CaseProfileCreator({ onSaved, onCancel }) {
                     <div onDragOver={(e)=>e.preventDefault()} onDrop={onDrop} className="mt-2 rounded-2xl border-2 border-dashed border-slate-300 bg-white p-8 text-center cursor-pointer" onClick={onPickFiles}>
                       <Upload className="mx-auto h-8 w-8"/>
                       <p className="mt-2 text-sm text-slate-600">Drag & drop files here, or click to browse</p>
-                      <p className="text-xs text-slate-500">PDF, DOCX, PNG, JPG</p>
-                      <input ref={inputRef} type="file" className="hidden" multiple onChange={(e)=>onFilesSelected(e.target.files)} />
+                      <p className="text-xs text-slate-500">PDF, PNG, JPG</p>
+                      <input ref={inputRef} type="file" className="hidden" multiple accept={ACCEPTED_TYPES.join(",")} onChange={(e)=>onFilesSelected(e.target.files)} />
                     </div>
+                    {uploading && (<p className="mt-2 text-sm text-slate-500">Uploading…</p>)}
                     {draft.files.length > 0 && (
                       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
                         {draft.files.map((f, i) => (
@@ -219,6 +258,11 @@ function CaseProfileCreator({ onSaved, onCancel }) {
                         ))}
                       </div>
                     )}
+                    {uploadErrors.length > 0 && (
+                      <div className="mt-4 text-sm text-red-600">
+                        {uploadErrors.map((err, i) => (<p key={i}>{err}</p>))}
+                      </div>
+                    )}
                   </div>
                   <div className="md:col-span-1">
                     <Label>Automation</Label>
@@ -227,7 +271,7 @@ function CaseProfileCreator({ onSaved, onCancel }) {
                       <div className="flex items-center justify-between"><div className="text-sm"><div className="font-medium">Forensic metadata</div><div className="text-slate-500">Hashes, sizes, timestamps</div></div><Switch checked={draft.extractForensicMeta} onCheckedChange={(v)=>update("extractForensicMeta", !!v)} /></div>
                       <div className="flex items-center justify-between"><div className="text-sm"><div className="font-medium">Auto-summary</div><div className="text-slate-500">Generate an overview</div></div><Switch checked={draft.summarizeOnUpload} onCheckedChange={(v)=>update("summarizeOnUpload", !!v)} /></div>
                       <Separator className="my-2"/>
-                      <Button className="w-full rounded-2xl" disabled={busy || draft.files.length===0} onClick={analyzeUploads}>{busy ? "Analyzing…" : "Analyze uploads"}</Button>
+                      <Button className="w-full rounded-2xl" disabled={busy || uploading || draft.files.length===0} onClick={analyzeUploads}>{busy ? "Analyzing…" : "Analyze uploads"}</Button>
                     </div>
                   </div>
                 </div>
