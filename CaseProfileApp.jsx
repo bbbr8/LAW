@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Plus, FileText, Upload, Trash2, Info, ChevronLeft, ChevronRight, CheckCircle2, Tags } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
 
 const STORAGE_KEY = "bj_case_profiles_v1";
 const loadCases = () => {
@@ -106,10 +107,10 @@ function CaseProfileCreator({ onSaved, onCancel }) {
     setBusy(true);
     await new Promise((r) => setTimeout(r, 800));
     const detected = [
-      { id: crypto.randomUUID(), name: "Michael Bryce Jones", role: "Plaintiff" },
-      { id: crypto.randomUUID(), name: "Suited Homes / Jeff Strong", role: "Contractor" },
-      { id: crypto.randomUUID(), name: "Fortis Private Bank", role: "Bank" },
-      { id: crypto.randomUUID(), name: "Colby Peterson", role: "Contractor" },
+      { id: uuidv4(), name: "Michael Bryce Jones", role: "Plaintiff" },
+      { id: uuidv4(), name: "Suited Homes / Jeff Strong", role: "Contractor" },
+      { id: uuidv4(), name: "Fortis Private Bank", role: "Bank" },
+      { id: uuidv4(), name: "Colby Peterson", role: "Contractor" },
     ];
     const autoTags = ["construction", "bank-draws", "fraud-investigation", "Utah", "2018-2019"];
     setDraft((d) => ({
@@ -120,7 +121,7 @@ function CaseProfileCreator({ onSaved, onCancel }) {
     }));
     setBusy(false);
   };
-  const addParty = () => setDraft((d) => ({ ...d, parties: [...d.parties, { id: crypto.randomUUID(), name: "", role: "Other" }] }));
+  const addParty = () => setDraft((d) => ({ ...d, parties: [...d.parties, { id: uuidv4(), name: "", role: "Other" }] }));
   const setPartyField = (idx, key, value) => setDraft((d) => ({ ...d, parties: d.parties.map((p, i) => (i === idx ? { ...p, [key]: value } : p)) }));
   const removeParty = (idx) => setDraft((d) => ({ ...d, parties: d.parties.filter((_, i) => i !== idx) }));
   const [newTag, setNewTag] = useState("");
@@ -129,7 +130,7 @@ function CaseProfileCreator({ onSaved, onCancel }) {
     setBusy(true);
     try {
       const fileDescs = draft.files.map((f) => ({ name: f.name, size: f.size, type: f.type }));
-      const record = { id: crypto.randomUUID(), createdAt: new Date().toISOString(), ...draft, files: fileDescs };
+      const record = { id: uuidv4(), createdAt: new Date().toISOString(), ...draft, files: fileDescs };
       saveCase(record);
       onSaved();
     } finally { setBusy(false); }
