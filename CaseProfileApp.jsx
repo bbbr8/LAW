@@ -9,30 +9,45 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Plus, FileText, Upload, Trash2, Info, ChevronLeft, ChevronRight, CheckCircle2, Tags } from "lucide-react";
 
-const STORAGE_KEY = "bj_case_profiles_v1";
-const loadCases = () => {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
-};
-const saveCase = (rec) => {
-  const all = loadCases();
-  all.unshift(rec);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-};
+const API_BASE = "https://api.example.com";
 
-function CaseLandingPage({ onNew, onOpen }) {
-  const [cases, setCases] = useState([]);
-  useEffect(() => { setCases(loadCases()); }, []);
+async function fetchCases(token) {
+  const res = await fetch(`${API_BASE}/cases`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to load cases");
+  return res.json();
+}
+
+async function saveCase(rec, token) {
+  const res = await fetch(`${API_BASE}/cases`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(rec),
+  });
+  if (!res.ok) throw new Error("Failed to save case");
+  return res.json();
+}
+
+function CaseLandingPage({ cases, user, onNew, onOpen }) {
+  const visibleCases = useMemo(
+    () => cases.filter((c) => !c.allowedRoles || c.allowedRoles.includes(user.role)),
+    [cases, user.role]
+  );
   return (
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">My Cases</h1>
         <Button className="rounded-2xl" onClick={onNew}>+ New Case</Button>
       </div>
-      {cases.length === 0 ? (
+      {visibleCases.length === 0 ? (
         <p className="text-slate-600">No cases yet. Click "New Case" to start.</p>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {cases.map((c) => (
+          {visibleCases.map((c) => (
             <Card key={c.id} onClick={() => onOpen(c)} className="rounded-2xl border shadow-sm bg-white cursor-pointer hover:shadow-md transition">
               <CardContent className="p-4">
                 <h2 className="text-lg font-medium mb-1">{c.caseName}</h2>
@@ -75,7 +90,48 @@ function CaseDetail({ caseData, onBack }) {
   );
 }
 
-function CaseProfileCreator({ onSaved, onCancel }) {
+function LoginPage({ onLoggedIn }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const submit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    const res = await fetch(`${API_BASE}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      onLoggedIn(data.user, data.token);
+    } else {
+      setError("Login failed");
+    }
+  };
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <Card className="w-full max-w-sm rounded-2xl">
+        <CardContent className="p-6">
+          <form onSubmit={submit} className="space-y-4">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            </div>
+            {error && <p className="text-sm text-red-600">{error}</p>}
+            <Button type="submit" className="w-full rounded-2xl">Log in</Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function CaseProfileCreator({ token, onSaved, onCancel }) {
   const [step, setStep] = useState(1);
   const [busy, setBusy] = useState(false);
   const inputRef = useRef(null);
@@ -130,8 +186,8 @@ function CaseProfileCreator({ onSaved, onCancel }) {
     try {
       const fileDescs = draft.files.map((f) => ({ name: f.name, size: f.size, type: f.type }));
       const record = { id: crypto.randomUUID(), createdAt: new Date().toISOString(), ...draft, files: fileDescs };
-      saveCase(record);
-      onSaved();
+      const saved = await saveCase(record, token);
+      onSaved(saved);
     } finally { setBusy(false); }
   };
   const StepPill = ({ n, label, active, done }) => (
@@ -273,7 +329,7 @@ function CaseProfileCreator({ onSaved, onCancel }) {
                   <div className="space-y-4">
                     <div className="rounded-2xl border p-4 bg-white">
                       <h4 className="font-medium">Ready?</h4>
-                      <p className="text-sm text-slate-600">Saves locally for now. Wire to your backend later.</p>
+                      <p className="text-sm text-slate-600">Data is stored securely on the server.</p>
                       <Button className="w-full mt-3 rounded-2xl" onClick={onCreateProfile} disabled={busy}>{busy ? "Creating…" : "Create profile"}</Button>
                     </div>
                   </div>
@@ -292,13 +348,27 @@ function CaseProfileCreator({ onSaved, onCancel }) {
 }
 
 export default function CaseProfileApp() {
-  const [view, setView] = useState("landing");
+  const [view, setView] = useState("login");
   const [selectedCase, setSelectedCase] = useState(null);
+  const [cases, setCases] = useState([]);
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (token) {
+      fetchCases(token).then(setCases).catch(console.error);
+    }
+  }, [token]);
+
+  if (!user) {
+    return <LoginPage onLoggedIn={(u, t) => { setUser(u); setToken(t); setView("landing"); }} />;
+  }
+
   return view === "landing" ? (
-    <CaseLandingPage onNew={() => setView("creator")} onOpen={(c) => { setSelectedCase(c); setView("detail"); }} />
+    <CaseLandingPage cases={cases} user={user} onNew={() => setView("creator")} onOpen={(c) => { setSelectedCase(c); setView("detail"); }} />
   ) : view === "detail" ? (
     <CaseDetail caseData={selectedCase} onBack={() => setView("landing")} />
   ) : (
-    <CaseProfileCreator onSaved={() => setView("landing")} onCancel={() => setView("landing")} />
+    <CaseProfileCreator token={token} onSaved={(rec) => { setCases((prev) => [rec, ...prev]); setView("landing"); }} onCancel={() => setView("landing")} />
   );
 }
