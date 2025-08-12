@@ -408,3 +408,5 @@ export default function CaseProfileApp() {
     <CaseProfileCreator onSaved={() => setView("landing")} onCancel={() => setView("landing")} />
   );
 }
+
+export { CaseLandingPage, CaseDetail, CaseProfileCreator };
