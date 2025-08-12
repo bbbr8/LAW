@@ -16,8 +16,14 @@ function decode(text) {
 
 export function addMessage(caseId, { text, author = 'unknown', internal = false }) {
   const encoded = encode(text);
+  // Older Node runtimes don't expose `crypto.randomUUID` globally. Mirror the
+  // fallback logic used in `tasks.js` so message IDs are still generated
+  // without blowing up when `crypto` is missing.
+  const id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2);
   const msg = {
-    id: crypto.randomUUID(),
+    id,
     text: encoded,
     author,
     internal: !!internal,
