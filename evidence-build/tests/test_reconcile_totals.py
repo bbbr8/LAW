@@ -1,6 +1,15 @@
 from decimal import Decimal
+import importlib.util
+from pathlib import Path
 
-from evidence_build.scripts.reconcile_totals import money, reconcile_rows
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "reconcile_totals.py"
+spec = importlib.util.spec_from_file_location("reconcile_totals", SCRIPT)
+module = importlib.util.module_from_spec(spec)
+assert spec and spec.loader
+spec.loader.exec_module(module)
+
+money = module.money
+reconcile_rows = module.reconcile_rows
 
 
 def test_money_normalizes_currency():
