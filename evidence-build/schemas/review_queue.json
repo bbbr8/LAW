@@ -1,0 +1,14 @@
+{
+  "title": "ReviewQueueRow",
+  "type": "object",
+  "required": ["item_id", "issue", "priority", "next_record_needed"],
+  "properties": {
+    "item_id": {"type": "string"},
+    "source_anchor": {"type": "string"},
+    "issue": {"type": "string"},
+    "current_status": {"type": "string"},
+    "priority": {"type": "string"},
+    "next_record_needed": {"type": "string"},
+    "review_note": {"type": "string"}
+  }
+}
