@@ -1,0 +1,28 @@
+name: Review Build Smoke Tests
+
+on:
+  pull_request:
+    paths:
+      - 'evidence-build/**'
+      - '.github/workflows/evidence-build-smoke.yml'
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r evidence-build/requirements.txt pytest
+      - name: Run tests
+        run: pytest evidence-build/tests
+      - name: Build HF registry sample
+        run: |
+          python evidence-build/scripts/build_hf_registry.py evidence-build/config/hf_model_registry.yml /tmp/hf_model_registry.csv --jsonl /tmp/hf_model_registry.jsonl
+          test -s /tmp/hf_model_registry.csv
+          test -s /tmp/hf_model_registry.jsonl
