@@ -1,0 +1,75 @@
+# Public-safe model registry for local document-review experiments.
+# Do not put private source text in this file.
+models:
+  - id: microsoft/table-transformer-detection
+    task: table_region_detection
+    stage: visual_layout
+    priority: P1
+    input: page_images
+    output: table_regions_csv
+    boundary: extraction_aid_only
+    url: https://hf.co/microsoft/table-transformer-detection
+  - id: microsoft/table-transformer-structure-recognition
+    task: table_structure_recognition
+    stage: table_qa
+    priority: P1
+    input: table_crops
+    output: cells_rows_columns_csv
+    boundary: compare_against_manual_or_native_rows
+    url: https://hf.co/microsoft/table-transformer-structure-recognition
+  - id: microsoft/layoutlmv3-base
+    task: layout_aware_form_extraction
+    stage: form_field_qa
+    priority: P2
+    input: ocr_tokens_with_boxes
+    output: key_value_candidates_json
+    boundary: human_review_required
+    url: https://hf.co/microsoft/layoutlmv3-base
+  - id: naver-clova-ix/donut-base-finetuned-docvqa
+    task: document_question_answering
+    stage: visual_qa
+    priority: P3
+    input: page_images_and_questions
+    output: answer_candidates_json
+    boundary: retrieval_or_triage_only
+    url: https://hf.co/naver-clova-ix/donut-base-finetuned-docvqa
+  - id: microsoft/trocr-base-printed
+    task: printed_ocr_fallback
+    stage: crop_ocr
+    priority: P2
+    input: low_confidence_text_crops
+    output: crop_text_candidates_csv
+    boundary: visual_check_required
+    url: https://hf.co/microsoft/trocr-base-printed
+  - id: microsoft/trocr-base-handwritten
+    task: handwritten_date_ocr
+    stage: crop_ocr
+    priority: P3
+    input: date_crops
+    output: date_text_candidates_csv
+    boundary: not_for_identity_or_authorship
+    url: https://hf.co/microsoft/trocr-base-handwritten
+  - id: BAAI/bge-small-en-v1.5
+    task: semantic_embedding
+    stage: search_index
+    priority: P2
+    input: source_grounded_chunks
+    output: vectors_or_embeddings_jsonl
+    boundary: retrieval_only
+    url: https://hf.co/BAAI/bge-small-en-v1.5
+  - id: BAAI/bge-reranker-base
+    task: semantic_reranking
+    stage: search_index
+    priority: P2
+    input: query_and_candidate_chunks
+    output: reranked_chunk_ids
+    boundary: ranking_aid_only
+    url: https://hf.co/BAAI/bge-reranker-base
+  - id: vidore/colpali-v1.2
+    task: visual_document_retrieval
+    stage: visual_search
+    priority: P3
+    input: page_images
+    output: visual_hit_list
+    boundary: retrieval_only
+    url: https://hf.co/vidore/colpali-v1.2
