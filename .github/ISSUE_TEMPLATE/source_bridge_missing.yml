@@ -1,0 +1,67 @@
+name: Source bridge missing
+description: Track a missing source bridge or closure record
+title: "Bridge missing: "
+labels: ["source-bridge", "needs-closure"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when a claim is useful but not closed because the needed source bridge is missing.
+  - type: input
+    id: claim_id
+    attributes:
+      label: Claim ID
+      description: Registry or synthetic claim identifier.
+      placeholder: SYN-001
+    validations:
+      required: true
+  - type: textarea
+    id: pressure_point
+    attributes:
+      label: Pressure point
+      description: State the exact issue this bridge would close.
+    validations:
+      required: true
+  - type: dropdown
+    id: source_status
+    attributes:
+      label: Current source status
+      options:
+        - bridge_missing
+        - source_routed
+        - source_conflict
+        - ocr_derived
+        - summary_only
+        - derived_analysis
+        - counsel_review
+    validations:
+      required: true
+  - type: textarea
+    id: missing_bridge
+    attributes:
+      label: Missing bridge record
+      description: Identify the record, field, page, route, or custodian needed to close the gap.
+    validations:
+      required: true
+  - type: textarea
+    id: next_action
+    attributes:
+      label: Next closure action
+      description: Demand route, review route, custodian, or follow-up question.
+    validations:
+      required: true
+  - type: dropdown
+    id: visual_lane
+    attributes:
+      label: Visual lane
+      options:
+        - bridge_board
+        - contradiction_matrix
+        - accounting_flow
+        - timeline
+        - source_status_heatmap
+        - page_layout_callout
+        - case_spine
+        - other
+    validations:
+      required: true
