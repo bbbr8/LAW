@@ -1,0 +1,80 @@
+name: Visual defect
+description: Track overlap, scale, chart-type, source-status, or export-readiness problems
+title: "Visual defect: "
+labels: ["visual-defect", "needs-design-fix"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when a chart, diagram, card, dashboard, or export frame fails the visual quality gate.
+  - type: input
+    id: visual_id
+    attributes:
+      label: Visual or claim ID
+      placeholder: VIS-001 or SYN-001
+    validations:
+      required: true
+  - type: dropdown
+    id: defect_type
+    attributes:
+      label: Defect type
+      options:
+        - wrong_chart_type
+        - visual_overlap
+        - unreadable_labels
+        - connector_crossing
+        - missing_source_status
+        - undisclosed_scale
+        - missing_audience
+        - export_status_overclaim
+        - old_version_not_retired
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: current_problem
+    attributes:
+      label: Current problem
+      description: State the defect directly.
+    validations:
+      required: true
+  - type: textarea
+    id: required_fix
+    attributes:
+      label: Required fix
+      description: State the chart, scale, source-status, layout, or export change needed.
+    validations:
+      required: true
+  - type: dropdown
+    id: corrected_visual_type
+    attributes:
+      label: Corrected visual type
+      options:
+        - subway_map
+        - sankey
+        - waterfall
+        - timeline
+        - heatmap
+        - bridge_board
+        - contradiction_matrix
+        - deposition_cascade
+        - page_layout_callout
+        - evidence_card
+        - table
+        - dashboard
+        - unknown
+    validations:
+      required: true
+  - type: dropdown
+    id: export_decision
+    attributes:
+      label: Export decision
+      options:
+        - blocked
+        - needs_source_closure
+        - needs_design_fix
+        - review_ready
+        - export_ready
+        - retired_superseded
+    validations:
+      required: true
