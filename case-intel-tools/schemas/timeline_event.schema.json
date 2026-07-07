@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Timeline Event Contract",
+  "description": "A source-status contract for redacted timeline and accounting events.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_id", "event_question", "event_lane", "date_status", "source_status", "next_action"],
+  "properties": {
+    "event_id": {"type": "string"},
+    "event_question": {"type": "string", "minLength": 12},
+    "event_lane": {"type": "string", "enum": ["agreement", "payment", "draw", "account", "invoice", "credit", "balance", "communication", "record_review", "visual_document", "other"]},
+    "event_date": {"type": "string", "format": "date"},
+    "date_status": {"type": "string", "enum": ["native_date", "metadata_date", "derived_date", "estimated_date", "date_conflict", "date_missing"]},
+    "source_status": {"type": "string", "enum": ["native_closed", "source_routed", "bridge_missing", "source_conflict", "ocr_derived", "summary_only", "derived_analysis", "review_needed"]},
+    "source_locator": {"type": "string"},
+    "actor": {"type": "string"},
+    "money_amount": {"type": "number"},
+    "pressure_point": {"type": "string"},
+    "bridge_needed": {"type": "string"},
+    "next_action": {"type": "string"},
+    "recommended_visual_type": {"type": "string"},
+    "notes": {"type": "string"}
+  }
+}
