@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Case Control Routed Record",
+  "type": "object",
+  "required": ["record_id", "source_status", "lanes", "bridge_record_needed", "discovery_target", "deposition_question"],
+  "properties": {
+    "record_id": {"type": "string"},
+    "source": {"type": "string"},
+    "date": {"type": "string"},
+    "speaker": {"type": "string"},
+    "recipient": {"type": "string"},
+    "page": {"type": "string"},
+    "text": {"type": "string"},
+    "amounts": {"type": "array", "items": {"type": "string"}},
+    "dates": {"type": "array", "items": {"type": "string"}},
+    "lanes": {"type": "array", "items": {"type": "string"}},
+    "fraud_elements": {"type": "array", "items": {"type": "string"}},
+    "money_buckets": {"type": "array", "items": {"type": "string"}},
+    "timeline_state": {"type": "string"},
+    "source_status": {"type": "string"},
+    "bridge_record_needed": {"type": "string"},
+    "fraud_clarity_answer": {"type": "string"},
+    "plain_english_meaning": {"type": "string"},
+    "why_bryce_cared": {"type": "string"},
+    "why_counsel_should_care": {"type": "string"},
+    "discovery_target": {"type": "string"},
+    "deposition_question": {"type": "string"},
+    "exhibit_card_title": {"type": "string"}
+  }
+}
