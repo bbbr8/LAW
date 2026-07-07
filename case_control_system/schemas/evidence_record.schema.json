@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Case Control Evidence Record",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "id": {"type": "string"},
+    "record_id": {"type": "string"},
+    "source": {"type": "string"},
+    "file": {"type": "string"},
+    "filename": {"type": "string"},
+    "document": {"type": "string"},
+    "date": {"type": "string"},
+    "speaker": {"type": "string"},
+    "from": {"type": "string"},
+    "recipient": {"type": "string"},
+    "to": {"type": "string"},
+    "page": {"type": "string"},
+    "source_tier": {"type": "string"},
+    "text": {"type": "string"},
+    "body": {"type": "string"},
+    "content": {"type": "string"},
+    "statement": {"type": "string"},
+    "summary": {"type": "string"}
+  }
+}
