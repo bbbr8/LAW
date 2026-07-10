@@ -30,6 +30,8 @@ npm test
 - Exact-first routing for amounts, dates, Bates numbers, checks, invoices, loans, accounts, lots, escrow files, and filenames
 - Evidence atoms with exact source lineage
 - Conclusion dependency tracking and stale-answer invalidation
+- Dead-lead and exculpatory memory
+- Source-family deduplication and version control
 - Human review gate before proof-debt closure
 - Hash-chained review decisions
 
@@ -39,3 +41,4 @@ See:
 
 - `docs/LIVING_PROOF_DEBT_RESOLVER.md`
 - `docs/EXACT_RETRIEVAL_AND_INVALIDATION.md`
+- `docs/DRIVE_SYNC_SCHEMA.md`
