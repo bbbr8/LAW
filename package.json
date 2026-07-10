@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run accounting\" \"npm run client\"",
     "server": "node server/server.js",
+    "accounting": "node server/accountingServer.js",
     "client": "npm run dev --prefix client",
     "test": "node --test"
   },
