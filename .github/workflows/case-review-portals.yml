@@ -1,0 +1,36 @@
+name: Case Review Reasoning Portals
+
+on:
+  push:
+    paths:
+      - "tools/case_review_reasoning_portals/**"
+      - ".github/workflows/case-review-portals.yml"
+  pull_request:
+    paths:
+      - "tools/case_review_reasoning_portals/**"
+      - ".github/workflows/case-review-portals.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependency
+        run: pip install -r tools/case_review_reasoning_portals/requirements.txt
+      - name: Run portal tests
+        run: pytest -q tools/case_review_reasoning_portals/tests
+      - name: Run source-bound example
+        run: |
+          cd tools/case_review_reasoning_portals
+          python case_review_portals.py example_case.json -o example_report.json
+          python - <<'PY'
+          import json
+          report = json.load(open("example_report.json"))
+          assert report["review_status"] == "PROPOSED"
+          assert report["truth_status"] == "UNRESOLVED"
+          assert report["reasoning_trace"]
+          print(report["direct_answer"])
+          PY
