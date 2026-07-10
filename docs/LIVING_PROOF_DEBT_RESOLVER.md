@@ -11,14 +11,15 @@ The system is deliberately conservative: it may create candidates and propagatio
 1. Load the case-wide pre-search context.
 2. Classify all materially connected lanes.
 3. Load open proof debts before building queries.
-4. Expand through canonical aliases while enforcing identity firewalls.
-5. Search direct issue terms and dependency-trigger terms.
-6. Log a search receipt.
-7. Compare every new source with every open debt.
-8. Create candidate resolution events at the configured threshold.
-9. Propagate each event through dependency edges.
-10. Validate the native source before changing a debt to Resolved.
-11. Rerun any conclusions affected by the event.
+4. Extract exact identifiers and query exact indexes before semantic retrieval.
+5. Expand through canonical aliases while enforcing identity firewalls.
+6. Search direct issue terms and dependency-trigger terms.
+7. Log a search receipt and coverage rows.
+8. Compare every new source with every open debt.
+9. Create candidate resolution events at the configured threshold.
+10. Propagate each event through dependency edges.
+11. Validate the native source and complete human review before changing a debt to Resolved.
+12. Invalidate and rerun conclusions affected by the event.
 
 ## Core records
 
@@ -72,7 +73,7 @@ A search receipt should contain at minimum:
 - pre-search context version;
 - lanes loaded;
 - source families searched;
-- query variants;
+- exact and semantic query variants;
 - direct and contrary hits;
 - proof debts created or updated;
 - candidate resolutions;
@@ -103,67 +104,68 @@ No score authorizes automatic closure.
 
 ## API
 
-### Create or list proof debts
+### Proof debts
 
 - `GET /api/cases/:id/proof-debts`
 - `POST /api/cases/:id/proof-debts`
 - `PATCH /api/cases/:id/proof-debts/:debtId`
 
-### Log search runs
+### Search runs
 
 - `GET /api/cases/:id/search-runs`
 - `POST /api/cases/:id/search-runs`
 
 A search run requires `preSearchContextVersion` and at least one `lanesLoaded` entry.
 
-### Create dependency edges
+### Query planning and exact indexes
+
+- `POST /api/cases/:id/route-query`
+- `POST /api/cases/:id/exact-index-entries`
+- `GET /api/cases/:id/exact-index-entries`
+
+Exact lookup precedes semantic expansion for money, dates, Bates numbers, checks, invoices, loans, accounts, draws, lots, escrow files, and filenames.
+
+### Dependency edges
 
 - `GET /api/cases/:id/dependencies`
 - `POST /api/cases/:id/dependencies`
 
-### Ingest evidence and evaluate all open debts
+### Evidence ingestion and candidate matching
 
 - `POST /api/cases/:id/evidence-sources`
 
-The response returns:
+The response returns the stored evidence source, all candidate debt matches, resolution events, dependency effects, and `autoResolved: false`.
 
-- the stored evidence source;
-- all candidate proof-debt matches;
-- resolution events;
-- propagated dependency effects;
-- `autoResolved: false` as an explicit guardrail.
+### Evidence atoms and conclusions
 
-### Read resolution history
+- `POST /api/cases/:id/evidence-atoms`
+- `GET /api/cases/:id/evidence-atoms`
+- `POST /api/cases/:id/conclusions`
+- `GET /api/cases/:id/conclusions`
 
-- `GET /api/cases/:id/resolution-events`
+A conclusion with a broken atom-to-source chain is stored as `Review Required`.
+
+### Invalidation and human review
+
+- `POST /api/cases/:id/reconcile-invalidations`
+- `GET /api/cases/:id/invalidations`
+- `POST /api/cases/:id/review-decisions`
+
+An accepted review requires native, identity-firewall, and contrary-evidence checks. Review decisions are hash chained.
 
 ## Identity firewalls
 
-Alias expansion increases recall but can increase contamination. Maintain explicit barriers for:
-
-- borrower and loan number;
-- property and address;
-- project or lot;
-- bank account;
-- legal entity;
-- vendor account;
-- document version;
-- Bates family and native source file.
+Alias expansion increases recall but can increase contamination. Maintain explicit barriers for borrower and loan number, property and address, project or lot, bank account, legal entity, vendor account, document version, Bates family, and native source file.
 
 A semantic alias match may create a candidate. It may not cross an identity firewall without exact source support.
 
 ## Downstream propagation
 
-Dependency edges should identify what changes when a debt is resolved or weakened. Examples:
-
-- a project ledger affects Lot 2, owner advances, final accounting, and damages;
-- a Draw 3 parent email affects authorization, lender process, causation, and claimed debt;
-- a vendor credit memo affects project application, missing scope, duplicate charges, and damages;
-- a later litigation exhibit affects source status, reliance, discovery chronology, and limitations analysis.
+Dependency edges identify what changes when a debt is resolved or weakened. A project ledger can affect Lot 2, owner advances, final accounting, and damages. A Draw 3 parent email can affect authorization, lender process, causation, and claimed debt. A vendor credit can affect project application, missing scope, repeated charges, and damages. A later litigation exhibit can affect source status, reliance, discovery chronology, and limitations analysis.
 
 ## Drive integration
 
-The Google Drive master dashboard contains the corresponding control tabs:
+The Google Drive master dashboard contains:
 
 - `PRE_SEARCH_CONTEXT`
 - `PROOF_DEBT_RESOLVER`
@@ -172,5 +174,15 @@ The Google Drive master dashboard contains the corresponding control tabs:
 - `RESOLUTION_EVENTS`
 - `DEPENDENCY_GRAPH`
 - `RESOLVER_ANALYTICS`
+- `CONTEXT_VERSIONS`
+- `EXACT_INDEX_ROUTER`
+- `EVIDENCE_ATOMS`
+- `ANSWER_LINEAGE`
+- `CONCLUSION_INVALIDATION`
+- `DEAD_LEAD_EXCULPATORY`
+- `SOURCE_FAMILY_DEDUP`
+- `HUMAN_REVIEW_QUEUE`
+- `COVERAGE_GATE`
+- `NEXT_BEST_SEARCH`
 
-The code and Drive schema should use stable IDs so events can be synchronized without relying on row position.
+See `docs/EXACT_RETRIEVAL_AND_INVALIDATION.md` for the second-stage controls.
