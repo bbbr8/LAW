@@ -1,0 +1,63 @@
+{
+  "manifest_version": "1.0.0",
+  "verified_on": "2026-07-10",
+  "control_rule": "Models propose candidates only. All outputs enter as DERIVED_ONLY and require source anchors plus human review.",
+  "default_stack": [
+    {
+      "model_id": "ibm-granite/granite-docling-258M",
+      "role": "document_layout_ocr_table_candidate_extraction",
+      "license": "apache-2.0",
+      "promotion_rule": "Never promote extracted values without exact page/bbox/text anchor and native visual verification."
+    },
+    {
+      "model_id": "BAAI/bge-m3",
+      "role": "dense_retrieval",
+      "license": "mit",
+      "promotion_rule": "Retrieval score is not proof; preserve keyword, filter, and graph retrieval lanes."
+    },
+    {
+      "model_id": "BAAI/bge-reranker-v2-m3",
+      "role": "candidate_reranking",
+      "license": "apache-2.0",
+      "promotion_rule": "Reranking may change order only; it cannot suppress contrary evidence or source-control records."
+    },
+    {
+      "model_id": "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli",
+      "role": "contradiction_candidate_generation",
+      "license": "mit",
+      "promotion_rule": "NLI labels open the typed contradiction portal; scope/time/value compatibility must be tested deterministically."
+    }
+  ],
+  "optional_nondefault": [
+    {
+      "model_id": "microsoft/layoutlmv3-base",
+      "role": "layout_experiments",
+      "license": "cc-by-nc-sa-4.0",
+      "warning": "Noncommercial license; do not make this a production default without license review."
+    }
+  ],
+  "benchmarks": [
+    {
+      "dataset_id": "theatticusproject/cuad-qa",
+      "use": "contract clause extraction and question-answer evaluation"
+    },
+    {
+      "dataset_id": "docling-project/DocLayNet-v1.2",
+      "use": "layout and region extraction evaluation"
+    }
+  ],
+  "portal_model_routes": {
+    "source_integrity": [],
+    "identity_firewall": ["BAAI/bge-m3"],
+    "timeline_knowledge": ["BAAI/bge-m3"],
+    "money_flow": ["ibm-granite/granite-docling-258M", "BAAI/bge-m3"],
+    "contract_scope": ["ibm-granite/granite-docling-258M", "BAAI/bge-m3", "BAAI/bge-reranker-v2-m3"],
+    "authorization": ["ibm-granite/granite-docling-258M"],
+    "claim_drift": ["BAAI/bge-m3", "BAAI/bge-reranker-v2-m3"],
+    "contradiction": ["MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli"],
+    "alternative_explanations": [],
+    "bridge_records": ["BAAI/bge-m3"],
+    "legal_elements": ["BAAI/bge-m3", "BAAI/bge-reranker-v2-m3"],
+    "entropy_health": []
+  }
+}
