@@ -10,6 +10,18 @@ function normalized(value) {
   return String(value ?? '').trim().toLowerCase()
 }
 
+function stableValue(value) {
+  if (Array.isArray(value)) return value.map(stableValue)
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map(key => [key, stableValue(value[key])]),
+    )
+  }
+  return value
+}
+
 export function validateEvidenceAtom(atom) {
   const errors = []
   if (!atom?.id) errors.push('id is required')
@@ -40,8 +52,12 @@ export function traceConclusion(conclusion, atoms) {
     }
   }
 
-  if (requestedAtomIds.length === 0) lineageBreaks.push({ conclusionId: conclusion?.id, errors: ['No supporting atoms'] })
-  if (missingAtomIds.length > 0) lineageBreaks.push({ conclusionId: conclusion?.id, errors: [`Missing atoms: ${missingAtomIds.join(', ')}`] })
+  if (requestedAtomIds.length === 0) {
+    lineageBreaks.push({ conclusionId: conclusion?.id, errors: ['No supporting atoms'] })
+  }
+  if (missingAtomIds.length > 0) {
+    lineageBreaks.push({ conclusionId: conclusion?.id, errors: [`Missing atoms: ${missingAtomIds.join(', ')}`] })
+  }
 
   return {
     conclusionId: conclusion?.id,
@@ -143,7 +159,7 @@ export function applyHumanReview({ debt, event, decision, reviewer, checks = {},
 }
 
 export function createAuditChainEvent(event, previousHash = '') {
-  const canonical = JSON.stringify({ previousHash, event }, Object.keys({ previousHash, event }).sort())
+  const canonical = JSON.stringify(stableValue({ previousHash, event }))
   const eventHash = crypto.createHash('sha256').update(canonical).digest('hex')
   return {
     ...event,
