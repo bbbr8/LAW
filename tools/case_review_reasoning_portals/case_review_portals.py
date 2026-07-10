@@ -235,9 +235,9 @@ class MoneyPortal(Portal):
         for a in owner:
             for d in draws:
                 da,dd=parse_dt(a.date),parse_dt(d.date)
-                gap=abs((dd-da).days) if da and dd else 99999
+                gap=(dd-da).days if da and dd else 99999
                 same=(a.purpose and d.purpose and norm(a.purpose)==norm(d.purpose)) or (a.category and d.category and norm(a.category)==norm(d.category))
-                if gap<=120 and same:dup.append((a,d))
+                if 0 <= gap <= 120 and same:dup.append((a,d))
         def rows(items):
             ids={t.source_record_id for t in items if t.source_record_id};return [by[i] for i in ids if i in by]
         if credit:o.append(obs(self.portal_id,f"{len(credit)} owner payment(s) lack closed credit/reimbursement treatment.","CRITICAL",rows(credit),["OWNER_ADVANCE","CREDIT_UNRESOLVED"],"MNY-1"))
@@ -372,7 +372,14 @@ class EntropyPortal(Portal):
         n=max(1,len(rs))
         context=mean(mean([bool(r.source_family),bool(r.event_at or r.created_at),bool(r.metadata.get("document_type")),bool(r.metadata.get("project_id") or r.metadata.get("loan_id") or r.metadata.get("lot_id")),bool(r.custodian)]) for r in rs)
         provenance=mean(.45*source_strength(r.source_status)+.2*bool(r.content_hash)+.2*any(a.locatable() for a in r.anchors)+.15*bool(r.custodian) for r in rs)
-        graph=sum(bool(r.related_record_ids or r.parent_record_id) for r in rs)/n
+        record_ids={r.record_id for r in rs}
+        connected=set()
+        for r in rs:
+            targets=[x for x in r.related_record_ids if x in record_ids]
+            if r.parent_record_id and r.parent_record_id in record_ids: targets.append(r.parent_record_id)
+            if targets:
+                connected.add(r.record_id); connected.update(targets)
+        graph=len(connected)/n
         dated=sum(bool(parse_dt(r.event_at or r.created_at)) for r in rs)/n
         g=defaultdict(list)
         for r in rs:
@@ -431,7 +438,7 @@ class Engine:
         return Report(f"RUN-{uuid.uuid4().hex[:12]}",datetime.now(timezone.utc).isoformat(),q,executed,status,ReviewStatus.PROPOSED,answer,results,
           ["identity","time","money","scope/obligation","document status","actor state","process","alternative explanation","legal element"],
           bridges,trace,["new native evidence","changed identity","corrected amount","new version","new testimony","court or expert development"],violations,
-          {"engine":"case-review-reasoning-portals","version":"1.0.0","records":len(rs),"claims":sum(len(r.claims) for r in rs),"transactions":sum(len(r.transactions) for r in rs),"observations":len(observations),"branches":len(branches),"control_rule":"Native/source records control; AI is assistive only."})
+          {"engine":"case-review-reasoning-portals","version":"1.0.1","records":len(rs),"claims":sum(len(r.claims) for r in rs),"transactions":sum(len(r.transactions) for r in rs),"observations":len(observations),"branches":len(branches),"control_rule":"Native/source records control; AI is assistive only."})
 
 
 def record_from_dict(d):
