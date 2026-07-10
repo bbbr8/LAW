@@ -9,6 +9,7 @@ import {
   findResolutionCandidates,
   propagateResolutionEvent,
 } from './proofDebtResolver.js'
+import { registerAdvancedRoutes } from './advancedRoutes.js'
 
 const upload = multer({ dest: 'server/upload-dir' })
 const app = express()
@@ -17,6 +18,7 @@ app.use(express.json({ limit: '10mb' }))
 
 const PORT = 3001
 const dbPromise = initDb()
+registerAdvancedRoutes(app, dbPromise)
 
 function parseRows(rows) {
   return rows.map(row => JSON.parse(row.data))
