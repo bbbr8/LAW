@@ -4,11 +4,12 @@ import multer from 'multer'
 import crypto from 'crypto'
 import fs from 'fs'
 import { initDb } from './db.js'
+import { hybridSearch } from './ai-search/hybrid-search.js'
 
 const upload = multer({ dest: 'server/upload-dir' })
 const app = express()
 app.use(cors())
-app.use(express.json())
+app.use(express.json({ limit: '5mb' }))
 
 const PORT = 3001
 const dbPromise = initDb()
@@ -59,9 +60,25 @@ app.post('/api/cases/:id/tasks', async (req, res) => {
 
 app.post('/api/scan-upload', upload.single('file'), async (req, res) => {
   const file = req.file
-  const buffer = await fs.promises.readFile(file.path)
-  const sha256 = crypto.createHash('sha256').update(buffer).digest('hex')
-  res.json({ safe: true, name: file.originalname, size: file.size, mime: file.mimetype, sha256 })
+  if (!file) return res.status(400).json({ error: 'file is required' })
+
+  try {
+    const buffer = await fs.promises.readFile(file.path)
+    const sha256 = crypto.createHash('sha256').update(buffer).digest('hex')
+    return res.json({ safe: true, name: file.originalname, size: file.size, mime: file.mimetype, sha256 })
+  } finally {
+    await fs.promises.unlink(file.path).catch(() => {})
+  }
+})
+
+app.post('/api/ai-search', async (req, res) => {
+  try {
+    const result = await hybridSearch(req.body || {})
+    res.json(result)
+  } catch (error) {
+    const status = error instanceof TypeError || error instanceof RangeError ? 400 : 500
+    res.status(status).json({ error: error.message || 'AI search failed' })
+  }
 })
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))
