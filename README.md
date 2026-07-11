@@ -1,6 +1,6 @@
 # Case Profile and Evidence-Control App
 
-A React + Express case-management application with efficient local Hugging Face hybrid search, living proof-debt resolution, exact-first retrieval, evidence lineage, AI New Finding review, conclusion invalidation, and native-accounting reconciliation services.
+A React + Express case-management application with efficient local Hugging Face hybrid search, living proof-debt resolution, exact-first retrieval, evidence lineage, AI New Finding review, conclusion invalidation, native-accounting reconciliation services, and a source-bound connector communication bus.
 
 ## Setup and run
 
@@ -77,6 +77,22 @@ Human confirmation requires source-complete lineage plus native-source, identity
 
 The system never treats a match score, equal amount, aggregate balance, derived report, AI finding, or unresolved adjustment as proof by itself. Native provenance and recorded human review remain controlling.
 
+## Connector communication bus
+
+The connector bus provides one auditable message contract for Google Drive, Gmail, GitHub, Hugging Face, Figma/FigJam, Dropbox, and the Case API.
+
+- Every transfer retains stable object identity, native locator, hash/revision, source status, proof tier, privacy mode, correlation history, and promotion state.
+- Message creation and per-target delivery rows use a transactional outbox.
+- Deterministic idempotency prevents repeated synchronization from becoming false duplicate corroboration.
+- Delivery workers claim messages, record attempts and receipts, acknowledge completed work, and maintain stream checkpoints.
+- Google Drive and other mutations require explicit scoped authorization.
+- GitHub never receives raw case text or privileged evidence.
+- Hugging Face receives only bounded local/private derivative work and returns promotion-blocked candidates.
+- Figma/FigJam receives source-manifested visual projections rather than proof.
+- Native evidence bytes and connector credentials are prohibited from the message payload.
+
+See `docs/CONNECTOR_COMMUNICATION_PROTOCOL.md` and `schemas/connector-envelope.schema.json`.
+
 ## Documentation
 
 - `docs/AI_NEW_FINDING_LIFECYCLE.md`
@@ -85,3 +101,5 @@ The system never treats a match score, equal amount, aggregate balance, derived 
 - `docs/EXACT_RETRIEVAL_AND_INVALIDATION.md`
 - `docs/NATIVE_ACCOUNTING_RECONCILIATION_ENGINE.md`
 - `docs/DRIVE_SYNC_SCHEMA.md`
+- `docs/CONNECTOR_COMMUNICATION_PROTOCOL.md`
+- `schemas/connector-envelope.schema.json`
