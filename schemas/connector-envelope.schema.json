@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bbbr8/LAW/schemas/connector-envelope.schema.json",
+  "title": "Source-Bound Connector Envelope",
+  "description": "Transport-neutral message contract for the Case API, Google Drive, Gmail, GitHub, Hugging Face, Figma/FigJam, and Dropbox.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "id", "caseId", "correlationId", "idempotencyKey",
+    "contentDigest", "createdAt", "observedAt", "sourceSystem", "targets",
+    "eventType", "objectType", "objectId", "intent", "source", "privacy",
+    "promotion", "payload"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "connector-envelope.v1" },
+    "id": { "type": "string", "pattern": "^XMSG-" },
+    "caseId": { "type": "string", "minLength": 1 },
+    "correlationId": { "type": "string", "minLength": 1 },
+    "causationId": { "type": ["string", "null"] },
+    "idempotencyKey": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "contentDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "occurredAt": { "type": ["string", "null"], "format": "date-time" },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "sourceSystem": {
+      "enum": ["case_api", "google_drive", "gmail", "github", "hugging_face", "figma", "dropbox"]
+    },
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["case_api", "google_drive", "gmail", "github", "hugging_face", "figma", "dropbox"]
+      }
+    },
+    "eventType": { "type": "string", "minLength": 1 },
+    "objectType": { "type": "string", "minLength": 1 },
+    "objectId": { "type": "string", "minLength": 1 },
+    "intent": {
+      "enum": ["observe", "route", "analyze", "visualize", "mutate", "acknowledge"]
+    },
+    "operation": { "type": ["string", "null"] },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "proofTier", "nativeLocator", "sourceHash", "revision", "sourceFamilyId", "bridgeRecordNeeded"],
+      "properties": {
+        "status": {
+          "enum": [
+            "native_source", "first_person_source_fact", "sworn_source_fact",
+            "source_derived", "investigative_inference", "proof_gap", "candidate",
+            "human_confirmed", "non_proof", "context_only", "superseded",
+            "rejected", "quarantined", "do_not_count"
+          ]
+        },
+        "proofTier": { "type": ["string", "null"] },
+        "nativeLocator": { "type": ["string", "null"] },
+        "sourceHash": { "type": ["string", "null"] },
+        "revision": { "type": ["string", "null"] },
+        "sourceFamilyId": { "type": ["string", "null"] },
+        "bridgeRecordNeeded": { "type": ["string", "null"] }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sensitivity", "privilege", "payloadMode", "processingScope"],
+      "properties": {
+        "sensitivity": {
+          "enum": ["public_control", "internal", "confidential", "restricted_case"]
+        },
+        "privilege": {
+          "enum": ["none", "confidential", "privileged"]
+        },
+        "payloadMode": {
+          "enum": [
+            "source_pointer", "metadata", "redacted_derivative", "control_record",
+            "visual_projection", "model_candidate", "acknowledgement"
+          ]
+        },
+        "processingScope": {
+          "type": ["string", "null"],
+          "enum": [null, "local", "private_endpoint", "private_space"]
+        }
+      }
+    },
+    "authorization": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    },
+    "promotion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blocked", "reasons"],
+      "properties": {
+        "blocked": { "type": "boolean" },
+        "reasons": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "payload": {
+      "type": "object",
+      "description": "Native file bytes and credentials are prohibited by runtime validation."
+    }
+  }
+}
