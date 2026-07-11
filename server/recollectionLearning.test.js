@@ -120,7 +120,7 @@ test('Hugging Face projection remains metadata-only unless explicitly approved',
 test('scores native evidence candidates without promoting them', () => {
   const statement = buildStatement({
     ...base,
-    exactLanguage: 'I was told the $15,000 excavator advance would come back in the draw and was not extra money.',
+    exactLanguage: 'On 2018-03-30, I was told the $15,000 excavator advance would come back in the draw and was not extra money.',
     dimension: 'recollection_of_other_statement',
     topicIds: ['bridge-funding'],
   })
@@ -128,13 +128,14 @@ test('scores native evidence candidates without promoting them', () => {
     id: 'SRC-1',
     sourceStatus: 'native_source',
     topicIds: ['bridge-funding'],
-    text: 'Text message: $15,000 for the excavator will come back in the draw and is not extra money.',
+    text: 'Text message dated 2018-03-30: $15,000 for the excavator will come back in the draw and is not extra money.',
     nativeLocator: 'MBJ_072057',
   })
   assert.ok(result.score >= 70)
   assert.equal(result.candidateType, 'strong_source_candidate')
   assert.equal(result.promotionBlocked, true)
   assert.ok(result.matchingKeys.includes('amount:15000.00'))
+  assert.ok(result.matchingKeys.includes('date:2018-03-30'))
 })
 
 test('promotion of self facts requires human and scope checks', () => {
