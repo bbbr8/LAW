@@ -129,6 +129,34 @@ export async function initDb() {
       data TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS connector_messages (
+      id TEXT PRIMARY KEY,
+      caseId TEXT NOT NULL,
+      sourceSystem TEXT NOT NULL,
+      idempotencyKey TEXT NOT NULL,
+      createdAt TEXT NOT NULL,
+      data TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS connector_deliveries (
+      id TEXT PRIMARY KEY,
+      caseId TEXT NOT NULL,
+      messageId TEXT NOT NULL,
+      targetSystem TEXT NOT NULL,
+      status TEXT NOT NULL,
+      updatedAt TEXT NOT NULL,
+      data TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS connector_checkpoints (
+      id TEXT PRIMARY KEY,
+      caseId TEXT NOT NULL,
+      connectorId TEXT NOT NULL,
+      stream TEXT NOT NULL,
+      updatedAt TEXT NOT NULL,
+      data TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_messages_case ON messages(caseId);
     CREATE INDEX IF NOT EXISTS idx_tasks_case ON tasks(caseId);
     CREATE INDEX IF NOT EXISTS idx_proof_debts_case ON proof_debts(caseId);
@@ -152,6 +180,18 @@ export async function initDb() {
     CREATE INDEX IF NOT EXISTS idx_context_versions_case ON context_versions(caseId);
     CREATE INDEX IF NOT EXISTS idx_dead_leads_case ON dead_leads(caseId);
     CREATE INDEX IF NOT EXISTS idx_coverage_search_run ON coverage_rows(searchRunId);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_connector_messages_case_idempotency
+      ON connector_messages(caseId, idempotencyKey);
+    CREATE INDEX IF NOT EXISTS idx_connector_messages_case_created
+      ON connector_messages(caseId, createdAt);
+    CREATE INDEX IF NOT EXISTS idx_connector_messages_source
+      ON connector_messages(caseId, sourceSystem);
+    CREATE INDEX IF NOT EXISTS idx_connector_deliveries_queue
+      ON connector_deliveries(caseId, targetSystem, status, updatedAt);
+    CREATE INDEX IF NOT EXISTS idx_connector_deliveries_message
+      ON connector_deliveries(caseId, messageId);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_connector_checkpoints_stream
+      ON connector_checkpoints(caseId, connectorId, stream);
   `)
 
   return db
