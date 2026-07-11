@@ -30,6 +30,10 @@ const PROMOTION_BLOCKED_CLASSES = new Set([
   'interpretation',
 ])
 
+function preserveExactLanguage(value = '') {
+  return String(value).replace(/\r\n/g, '\n').trim()
+}
+
 function normalizeText(value = '') {
   return String(value)
     .normalize('NFKC')
@@ -116,7 +120,7 @@ function promotionBlockers(sourceClass, dimension) {
 
 export function validateStatementInput(input = {}) {
   const errors = []
-  const exactLanguage = normalizeText(input.exactLanguage)
+  const exactLanguage = preserveExactLanguage(input.exactLanguage)
   const sourceClass = normalizeToken(input.sourceClass)
   const dimension = normalizeToken(input.dimension)
   const topicIds = normalizeStringArray(input.topicIds).map(normalizeToken)
@@ -206,6 +210,7 @@ export function compareStatementVersions(previous, nextInput = {}) {
     supersedesId: previous.id,
     createdAt: nextInput.createdAt,
     recordedAt: nextInput.recordedAt,
+    currentStatus: nextInput.currentStatus,
   })
 
   const previousKeys = new Set(previous.exactKeys || extractNormalizedKeys(previous.exactLanguage || ''))
