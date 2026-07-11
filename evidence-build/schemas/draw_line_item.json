@@ -1,0 +1,17 @@
+{
+  "title": "DrawLineItem",
+  "type": "object",
+  "required": ["doc_id", "row_no", "description", "amount_requested"],
+  "properties": {
+    "doc_id": {"type": "string"},
+    "source_id": {"type": "string"},
+    "source_page": {"type": "string"},
+    "row_no": {"type": "integer"},
+    "budget_line_item": {"type": "string"},
+    "description": {"type": "string"},
+    "amount_requested": {"type": "number"},
+    "payee": {"type": "string"},
+    "payee_address": {"type": "string"},
+    "notes": {"type": "string"}
+  }
+}

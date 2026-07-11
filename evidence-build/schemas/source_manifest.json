@@ -1,0 +1,15 @@
+{
+  "title": "SourceManifestRow",
+  "type": "object",
+  "required": ["source_id", "file_name", "tier", "sha256"],
+  "properties": {
+    "source_id": {"type": "string"},
+    "file_name": {"type": "string"},
+    "tier": {"type": "string"},
+    "drive_id": {"type": "string"},
+    "page_count": {"type": "integer"},
+    "size_bytes": {"type": "integer"},
+    "sha256": {"type": "string"},
+    "notes": {"type": "string"}
+  }
+}
