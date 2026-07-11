@@ -157,6 +157,42 @@ export async function initDb() {
       data TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS user_statements (
+      id TEXT PRIMARY KEY,
+      caseId TEXT NOT NULL,
+      canonicalId TEXT NOT NULL,
+      version INTEGER NOT NULL,
+      isCurrent INTEGER NOT NULL DEFAULT 1,
+      currentStatus TEXT NOT NULL,
+      recordDigest TEXT NOT NULL,
+      data TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS statement_conflicts (
+      id TEXT PRIMARY KEY,
+      caseId TEXT NOT NULL,
+      canonicalId TEXT NOT NULL,
+      status TEXT NOT NULL,
+      data TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS statement_source_links (
+      id TEXT PRIMARY KEY,
+      caseId TEXT NOT NULL,
+      statementId TEXT NOT NULL,
+      sourceId TEXT,
+      createdAt TEXT NOT NULL,
+      data TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS topic_learning_examples (
+      id TEXT PRIMARY KEY,
+      caseId TEXT NOT NULL,
+      statementId TEXT NOT NULL,
+      exampleType TEXT NOT NULL,
+      data TEXT NOT NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_messages_case ON messages(caseId);
     CREATE INDEX IF NOT EXISTS idx_tasks_case ON tasks(caseId);
     CREATE INDEX IF NOT EXISTS idx_proof_debts_case ON proof_debts(caseId);
@@ -192,6 +228,20 @@ export async function initDb() {
       ON connector_deliveries(caseId, messageId);
     CREATE UNIQUE INDEX IF NOT EXISTS idx_connector_checkpoints_stream
       ON connector_checkpoints(caseId, connectorId, stream);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_user_statements_case_digest
+      ON user_statements(caseId, recordDigest);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_user_statements_canonical_version
+      ON user_statements(caseId, canonicalId, version);
+    CREATE INDEX IF NOT EXISTS idx_user_statements_current
+      ON user_statements(caseId, isCurrent, canonicalId);
+    CREATE INDEX IF NOT EXISTS idx_user_statements_status
+      ON user_statements(caseId, currentStatus);
+    CREATE INDEX IF NOT EXISTS idx_statement_conflicts_case_status
+      ON statement_conflicts(caseId, status);
+    CREATE INDEX IF NOT EXISTS idx_statement_source_links_statement
+      ON statement_source_links(caseId, statementId, createdAt);
+    CREATE INDEX IF NOT EXISTS idx_topic_learning_examples_statement
+      ON topic_learning_examples(caseId, statementId, exampleType);
   `)
 
   return db

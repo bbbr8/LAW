@@ -1,6 +1,6 @@
 # Case Profile and Evidence-Control App
 
-A React + Express case-management application with efficient local Hugging Face hybrid search, living proof-debt resolution, exact-first retrieval, evidence lineage, AI New Finding review, conclusion invalidation, native-accounting reconciliation services, and a source-bound connector communication bus.
+A React + Express case-management application with efficient local Hugging Face hybrid search, living proof-debt resolution, exact-first retrieval, evidence lineage, AI New Finding review, conclusion invalidation, native-accounting reconciliation services, a source-bound connector communication bus, and versioned first-person statement/recollection mini-learning.
 
 ## Setup and run
 
@@ -93,6 +93,20 @@ The connector bus provides one auditable message contract for Google Drive, Gmai
 
 See `docs/CONNECTOR_COMMUNICATION_PROTOCOL.md` and `schemas/connector-envelope.schema.json`.
 
+## First-person statement and recollection mini-learning
+
+The system preserves user statements, recollections, authored-source summaries, sworn first-person facts, interpretations, and later corrections as versioned source objects.
+
+- Exact user language remains preserved alongside any normalized retrieval text.
+- Statements are classified by scope: self action, knowledge, authorization, receipt timing, understanding, accounting correction, recollection of another statement/event, or interpretation.
+- A correction creates a new version and an open conflict when dates, amounts, classifications, or other material features change; the prior statement remains visible.
+- Topic examples include positive routes, hard negatives, exact-key features, required source fields, expected labels, and promotion gates.
+- Candidate evidence is scored against exact identifiers, topic overlap, lexical similarity, and source posture without automatic promotion.
+- Hugging Face projections exclude exact language by default and remain metadata-only unless a private approved workflow explicitly includes it.
+- A confirmed first-person fact remains limited to what the speaker did, knew, received, understood, or authorized; recollections about another actor still require independent attribution and intent proof.
+
+See `docs/FIRST_PERSON_RECOLLECTION_LEARNING.md`.
+
 ## Documentation
 
 - `docs/AI_NEW_FINDING_LIFECYCLE.md`
@@ -102,4 +116,5 @@ See `docs/CONNECTOR_COMMUNICATION_PROTOCOL.md` and `schemas/connector-envelope.s
 - `docs/NATIVE_ACCOUNTING_RECONCILIATION_ENGINE.md`
 - `docs/DRIVE_SYNC_SCHEMA.md`
 - `docs/CONNECTOR_COMMUNICATION_PROTOCOL.md`
+- `docs/FIRST_PERSON_RECOLLECTION_LEARNING.md`
 - `schemas/connector-envelope.schema.json`

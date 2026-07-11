@@ -9,6 +9,7 @@ import { registerAdvancedRoutes } from './advancedRoutes.js'
 import { registerProofDebtRoutes } from './proofDebtRoutes.js'
 import { registerAiFindingRoutes } from './aiFindingRoutes.js'
 import { registerConnectorRoutes } from './connectorRoutes.js'
+import { registerRecollectionRoutes } from './recollectionRoutes.js'
 
 const upload = multer({ dest: 'server/upload-dir' })
 const app = express()
@@ -21,6 +22,7 @@ registerProofDebtRoutes(app, dbPromise)
 registerAdvancedRoutes(app, dbPromise)
 registerAiFindingRoutes(app, dbPromise)
 registerConnectorRoutes(app, dbPromise)
+registerRecollectionRoutes(app, dbPromise)
 
 app.get('/api/cases', async (req, res, next) => {
   try {
