@@ -6,9 +6,10 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "node server/server.js",
     "client": "npm run dev --prefix client",
-    "test": "echo 'No tests specified'"
+    "test": "node --test"
   },
   "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",
