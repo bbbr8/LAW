@@ -393,7 +393,8 @@ export function evaluateStatementPromotion(statement, sourceLinks = [], review =
   const contraryChecked = review.contraryEvidenceChecked === true
   const identityChecked = review.identityFirewallChecked === true
   const observerTimeChecked = review.observerTimeChecked === true
-  const humanReviewed = review.humanReviewed === true && normalizeText(review.reviewer)
+  const humanReviewed = review.humanReviewed === true && Boolean(normalizeText(review.reviewer))
+  const allReviewGates = Boolean(humanReviewed && contraryChecked && identityChecked && observerTimeChecked)
   const selfLimitedDimension = ['self_action', 'self_knowledge', 'self_authorization', 'self_receipt_timing', 'self_understanding'].includes(statement.dimension)
 
   let status = statement.currentStatus
@@ -403,11 +404,11 @@ export function evaluateStatementPromotion(statement, sourceLinks = [], review =
   if (!identityChecked) reasons.push('identity firewall check missing')
   if (!observerTimeChecked) reasons.push('observer-time check missing')
 
-  if (selfLimitedDimension && humanReviewed && contraryChecked && identityChecked && observerTimeChecked && (nativeLinks.length || swornLinks.length || statement.sourceClass === 'sworn_first_person')) {
+  if (allReviewGates && selfLimitedDimension && (nativeLinks.length || swornLinks.length || statement.sourceClass === 'sworn_first_person')) {
     status = 'Human-Confirmed First-Person Fact — Limited to Speaker Knowledge'
-  } else if (nativeLinks.length && contraryChecked && identityChecked) {
+  } else if (allReviewGates && nativeLinks.length) {
     status = 'Source-Supported Statement — Attribution/Intent Still Separate'
-  } else if (links.length) {
+  } else if (allReviewGates && links.length) {
     status = 'Source-Routed Statement — Not Confirmed'
   }
 
@@ -416,6 +417,8 @@ export function evaluateStatementPromotion(statement, sourceLinks = [], review =
     previousStatus: statement.currentStatus,
     nextStatus: status,
     promoted: status !== statement.currentStatus,
+    reviewGatesSatisfied: allReviewGates,
+    linkedCandidateCount: links.length,
     nativeLinkCount: nativeLinks.length,
     swornLinkCount: swornLinks.length,
     reasons,
