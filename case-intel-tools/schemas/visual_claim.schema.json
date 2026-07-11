@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/visual_claim.schema.json",
+  "title": "Visual Claim Contract",
+  "description": "A source-status contract for charts, diagrams, evidence cards, and dashboards built from redacted or synthetic case data.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claim_id",
+    "case_question",
+    "visual_lane",
+    "recommended_visual_type",
+    "source_status",
+    "audience",
+    "scale_rule",
+    "export_status"
+  ],
+  "properties": {
+    "claim_id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_\\-]{4,80}$"
+    },
+    "case_question": {
+      "type": "string",
+      "minLength": 12
+    },
+    "visual_lane": {
+      "type": "string",
+      "enum": [
+        "case_navigation",
+        "accounting_flow",
+        "timeline_evolution",
+        "source_status",
+        "bridge_closure",
+        "contradiction",
+        "deposition",
+        "document_layout",
+        "exhibit_router",
+        "dashboard"
+      ]
+    },
+    "recommended_visual_type": {
+      "type": "string",
+      "enum": [
+        "subway_map",
+        "sankey",
+        "waterfall",
+        "swimlane",
+        "timeline",
+        "heatmap",
+        "evidence_card",
+        "bridge_board",
+        "contradiction_matrix",
+        "deposition_cascade",
+        "table",
+        "page_layout_callout",
+        "dashboard"
+      ]
+    },
+    "source_status": {
+      "type": "string",
+      "enum": [
+        "native_closed",
+        "source_routed",
+        "bridge_missing",
+        "source_conflict",
+        "ocr_derived",
+        "summary_only",
+        "derived_analysis",
+        "counsel_review"
+      ]
+    },
+    "drive_file_id": {
+      "type": "string"
+    },
+    "native_locator": {
+      "type": "string",
+      "description": "Bates range, page, exhibit number, Drive ID, or other native/source locator. Use bridge_missing if absent."
+    },
+    "actor": {
+      "type": "string"
+    },
+    "date_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "date_end": {
+      "type": "string",
+      "format": "date"
+    },
+    "money_amount": {
+      "type": "number"
+    },
+    "accounting_role": {
+      "type": "string",
+      "enum": [
+        "represented_cost",
+        "owner_payment",
+        "bank_draw",
+        "builder_account",
+        "vendor_invoice",
+        "vendor_payment",
+        "credit_reimbursement",
+        "final_balance",
+        "unknown"
+      ]
+    },
+    "bridge_needed": {
+      "type": "string"
+    },
+    "conflict_type": {
+      "type": "string",
+      "enum": [
+        "none",
+        "amount_conflict",
+        "date_conflict",
+        "actor_conflict",
+        "document_layout_conflict",
+        "signature_or_authorization_conflict",
+        "accounting_application_conflict",
+        "explanation_conflict"
+      ]
+    },
+    "scale_rule": {
+      "type": "string",
+      "enum": [
+        "zero_baseline_required",
+        "nonzero_baseline_disclosed",
+        "actual_date_spacing",
+        "categorical_spacing_disclosed",
+        "not_applicable"
+      ]
+    },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "internal_review",
+        "attorney_review",
+        "expert_review",
+        "deposition_prep",
+        "mediation",
+        "court_exhibit_candidate"
+      ]
+    },
+    "export_status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "needs_source_closure",
+        "needs_design_fix",
+        "review_ready",
+        "export_ready",
+        "retired_superseded"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "sourceStatus": {
+    "native_closed": {
+      "label": "Native closed",
+      "borderStyle": "solid-heavy",
+      "exportRule": "review_ready_or_export_ready"
+    },
+    "source_routed": {
+      "label": "Source routed",
+      "borderStyle": "solid-medium",
+      "exportRule": "review_ready_after_locator_check"
+    },
+    "bridge_missing": {
+      "label": "Bridge missing",
+      "borderStyle": "dashed-medium",
+      "exportRule": "not_export_ready_until_closure"
+    },
+    "source_conflict": {
+      "label": "Source conflict",
+      "borderStyle": "double-or-dashed",
+      "exportRule": "route_to_contradiction_matrix"
+    },
+    "ocr_derived": {
+      "label": "OCR derived",
+      "borderStyle": "dashed-light",
+      "exportRule": "page_image_controls"
+    },
+    "summary_only": {
+      "label": "Summary only",
+      "borderStyle": "dotted-light",
+      "exportRule": "not_evidence_grade_alone"
+    },
+    "derived_analysis": {
+      "label": "Derived analysis",
+      "borderStyle": "solid-light",
+      "exportRule": "separate_from_native_fact"
+    },
+    "counsel_review": {
+      "label": "Review needed",
+      "borderStyle": "solid-medium",
+      "exportRule": "hold_before_external_use"
+    }
+  },
+  "visualTypes": {
+    "subway_map": "case_navigation",
+    "sankey": "money_flow",
+    "waterfall": "balance_change",
+    "timeline": "event_sequence",
+    "heatmap": "source_status_matrix",
+    "bridge_board": "missing_record_closure",
+    "contradiction_matrix": "source_conflict_review",
+    "deposition_cascade": "question_sequence",
+    "page_layout_callout": "visual_document_review"
+  }
+}

@@ -1,0 +1,52 @@
+name: Case Intel Tools
+
+on:
+  pull_request:
+    paths:
+      - 'case-intel-tools/**'
+      - '.github/workflows/case-intel-tools.yml'
+  push:
+    paths:
+      - 'case-intel-tools/**'
+      - '.github/workflows/case-intel-tools.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r case-intel-tools/requirements-dev.txt
+
+      - name: Run unit tests
+        run: pytest case-intel-tools
+
+      - name: Run sample registry quality gate
+        run: python case-intel-tools/tools/visual_quality_gate.py case-intel-tools/synthetic_samples/visual_registry_sample.csv
+
+      - name: Run sample source-status scorecard
+        run: python case-intel-tools/tools/source_status_scorecard.py case-intel-tools/synthetic_samples/visual_registry_sample.csv
+
+      - name: Run sample bridge board generator
+        run: python case-intel-tools/tools/bridge_board_generator.py case-intel-tools/synthetic_samples/visual_registry_sample.csv
+
+      - name: Run sample evidence graph exporter
+        run: python case-intel-tools/tools/evidence_graph_exporter.py case-intel-tools/synthetic_samples/visual_registry_sample.csv
+
+      - name: Run sample Mermaid case spine generator
+        run: python case-intel-tools/tools/mermaid_case_spine_generator.py case-intel-tools/synthetic_samples/visual_registry_sample.csv
+
+      - name: Run sample Markdown experiment report
+        run: python case-intel-tools/tools/registry_markdown_report.py case-intel-tools/synthetic_samples/visual_registry_sample.csv
+
+      - name: Run sample chart router
+        run: python case-intel-tools/tools/chart_decision_router.py --intent accounting_flow --columns date,amount,payor,payee,source_status
