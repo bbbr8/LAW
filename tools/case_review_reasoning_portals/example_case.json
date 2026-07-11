@@ -1,0 +1,225 @@
+{
+  "question": "Were the owner advances temporary bridge funds that should have been credited, or approved permanent construction overages?",
+  "options": {
+    "decision_supported": "Counsel and forensic-accounting review of owner advances, draw overlap, authorization, and final credit treatment.",
+    "propositions": [
+      "The owner advances were temporary bridge funding rather than informed approval of permanent overages."
+    ],
+    "requested_portals": [
+      "money_flow",
+      "contract_scope",
+      "authorization",
+      "claim_drift",
+      "alternative_explanations"
+    ]
+  },
+  "records": [
+    {
+      "record_id": "REC-REPC",
+      "text": "Signed REPC construction amount: $791,456. There are not addenda.",
+      "source_family": "REPC",
+      "source_status": "NATIVE_VERIFIED",
+      "document_id": "DOC-REPC",
+      "created_at": "2018-01-22T12:00:00-07:00",
+      "event_at": "2018-01-22T12:00:00-07:00",
+      "custodian": "Owner",
+      "metadata": {
+        "document_type": "signed agreement",
+        "project_id": "MAPLETON-HOME",
+        "loan_id": "600000673",
+        "lot_id": "OWNER-LOT",
+        "address": "Mapleton Utah",
+        "bates_prefix": "FORTIS-JONES"
+      },
+      "anchors": [
+        {
+          "anchor_id": "ANC-REPC-1",
+          "record_id": "REC-REPC",
+          "exact_text": "Construction amount: $791,456",
+          "document_id": "DOC-REPC",
+          "page": 3,
+          "bates_start": "FORTIS-JONES 002849",
+          "extraction_method": "native_text",
+          "confidence": 1.0
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "CLM-BASE",
+          "subject_id": "MAPLETON-HOME",
+          "predicate": "contract_amount",
+          "value": 791456,
+          "value_type": "money",
+          "scope": "construction_baseline",
+          "effective_at": "2018-01-22",
+          "source_record_id": "REC-REPC",
+          "anchor_ids": ["ANC-REPC-1"],
+          "source_status": "NATIVE_VERIFIED",
+          "review_status": "PROPOSED"
+        }
+      ]
+    },
+    {
+      "record_id": "REC-ADV-25000",
+      "text": "Owner paid $25,000 now; the money was expected to come back through the draw.",
+      "source_family": "Owner bank record and text",
+      "source_status": "SOURCE_EXTRACT",
+      "document_id": "DOC-ADV",
+      "created_at": "2018-04-17T10:00:00-06:00",
+      "event_at": "2018-04-17T10:00:00-06:00",
+      "received_at": "2018-04-17T10:00:00-06:00",
+      "custodian": "Owner",
+      "metadata": {
+        "document_type": "owner check or wire",
+        "project_id": "MAPLETON-HOME",
+        "loan_id": "600000673",
+        "lot_id": "OWNER-LOT",
+        "address": "Mapleton Utah",
+        "authorization_status": "temporary_bridge_asserted",
+        "owner_seen": true
+      },
+      "anchors": [
+        {
+          "anchor_id": "ANC-ADV-1",
+          "record_id": "REC-ADV-25000",
+          "exact_text": "expected to come back through the draw",
+          "document_id": "DOC-ADV",
+          "page": 1,
+          "extraction_method": "native_text",
+          "confidence": 0.99
+        }
+      ],
+      "transactions": [
+        {
+          "transaction_id": "TX-ADV-25000",
+          "amount": 25000,
+          "date": "2018-04-17",
+          "payer": "Owner",
+          "payee": "Builder",
+          "project_id": "MAPLETON-HOME",
+          "lot_id": "OWNER-LOT",
+          "purpose": "framing",
+          "category": "framing",
+          "source_record_id": "REC-ADV-25000",
+          "anchor_ids": ["ANC-ADV-1"],
+          "authorization_status": "TEMPORARY_BRIDGE_ASSERTED",
+          "credit_status": "UNRESOLVED",
+          "transaction_type": "OWNER_ADVANCE"
+        }
+      ]
+    },
+    {
+      "record_id": "REC-DRAW2",
+      "text": "Draw 2 includes framing funding and an image-layer borrower signature.",
+      "source_family": "Fortis draw package",
+      "source_status": "COPY",
+      "document_id": "DOC-DRAW2",
+      "created_at": "2018-05-24T09:00:00-06:00",
+      "event_at": "2018-05-24T09:00:00-06:00",
+      "observed_at": "2026-06-01T09:00:00-06:00",
+      "custodian": "Lender production",
+      "metadata": {
+        "document_type": "draw packet",
+        "project_id": "MAPLETON-HOME",
+        "loan_id": "600000673",
+        "lot_id": "OWNER-LOT",
+        "address": "Mapleton Utah",
+        "signature_status": "DISPUTED",
+        "authorization_status": "UNVERIFIED",
+        "owner_seen": false
+      },
+      "anchors": [
+        {
+          "anchor_id": "ANC-DRAW2-1",
+          "record_id": "REC-DRAW2",
+          "exact_text": "Draw 2 framing",
+          "document_id": "DOC-DRAW2",
+          "page": 2,
+          "extraction_method": "visual_extract",
+          "confidence": 0.9
+        }
+      ],
+      "transactions": [
+        {
+          "transaction_id": "TX-DRAW2-FRAMING",
+          "amount": 46339.47,
+          "date": "2018-05-24",
+          "payer": "Fortis",
+          "payee": "Builder account",
+          "project_id": "MAPLETON-HOME",
+          "lot_id": "OWNER-LOT",
+          "purpose": "framing",
+          "category": "framing",
+          "source_record_id": "REC-DRAW2",
+          "anchor_ids": ["ANC-DRAW2-1"],
+          "authorization_status": "UNVERIFIED",
+          "credit_status": "UNKNOWN",
+          "transaction_type": "DRAW"
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "CLM-SIG2",
+          "subject_id": "DRAW-2",
+          "predicate": "signature_status",
+          "value": "DISPUTED",
+          "value_type": "status",
+          "scope": "borrower_signature",
+          "effective_at": "2018-05-24",
+          "source_record_id": "REC-DRAW2",
+          "anchor_ids": ["ANC-DRAW2-1"],
+          "source_status": "COPY",
+          "review_status": "PROPOSED"
+        }
+      ]
+    },
+    {
+      "record_id": "REC-BUDGET-FINAL",
+      "text": "Later spreadsheet labels the project budget as $1,339,826 and treats owner payments as overage.",
+      "source_family": "Later budget spreadsheet",
+      "source_status": "SUMMARY",
+      "document_id": "DOC-BUDGET-FINAL",
+      "created_at": "2019-02-01T10:00:00-07:00",
+      "event_at": "2018-03-16T10:00:00-06:00",
+      "observed_at": "2026-06-01T10:00:00-06:00",
+      "custodian": null,
+      "metadata": {
+        "document_type": "later budget",
+        "project_id": "MAPLETON-HOME",
+        "loan_id": "600000673",
+        "lot_id": "OWNER-LOT",
+        "owner_seen": false
+      },
+      "anchors": [
+        {
+          "anchor_id": "ANC-BUDGET-1",
+          "record_id": "REC-BUDGET-FINAL",
+          "exact_text": "$1,339,826",
+          "document_id": "DOC-BUDGET-FINAL",
+          "page": 1,
+          "extraction_method": "spreadsheet_extract",
+          "confidence": 0.98
+        }
+      ],
+      "claims": [
+        {
+          "claim_id": "CLM-BUDGET",
+          "subject_id": "MAPLETON-HOME",
+          "predicate": "revised_budget",
+          "value": 1339826,
+          "value_type": "money",
+          "scope": "construction_baseline",
+          "effective_at": "2018-03-16",
+          "asserted_at": "2019-02-01",
+          "source_record_id": "REC-BUDGET-FINAL",
+          "anchor_ids": ["ANC-BUDGET-1"],
+          "source_status": "SUMMARY",
+          "review_status": "PROPOSED",
+          "qualifiers": {
+            "signed_by_owner": false
+          }
+        }
+      ]
+    }
+  ]
+}

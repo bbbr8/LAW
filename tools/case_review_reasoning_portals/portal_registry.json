@@ -1,0 +1,98 @@
+{
+  "registry_version": "1.0.0",
+  "control_rule": "Native/source records control. Portals route and test evidence; they do not issue legal conclusions.",
+  "always_run": [
+    "source_integrity",
+    "identity_firewall",
+    "bridge_records",
+    "entropy_health"
+  ],
+  "execution_order": [
+    "source_integrity",
+    "identity_firewall",
+    "timeline_knowledge",
+    "money_flow",
+    "contract_scope",
+    "authorization",
+    "claim_drift",
+    "contradiction",
+    "alternative_explanations",
+    "bridge_records",
+    "legal_elements",
+    "entropy_health"
+  ],
+  "portals": {
+    "source_integrity": {
+      "name": "Source Integrity / Chain-of-Custody Portal",
+      "keywords": ["native", "metadata", "hash", "custodian", "source", "authentic", "bates"],
+      "depends_on": [],
+      "opens": ["bridge_records"]
+    },
+    "identity_firewall": {
+      "name": "Identity / Loan / Lot / Account Firewall Portal",
+      "keywords": ["loan", "lot", "account", "borrower", "project", "address", "bates", "vendor"],
+      "depends_on": ["source_integrity"],
+      "opens": ["money_flow", "authorization"]
+    },
+    "timeline_knowledge": {
+      "name": "Event-Time / Knowledge-Time / Litigation-Time Portal",
+      "keywords": ["when", "date", "timeline", "before", "after", "knowledge", "later", "received"],
+      "depends_on": ["source_integrity"],
+      "opens": ["claim_drift", "bridge_records"]
+    },
+    "money_flow": {
+      "name": "Money Rail / Same-Dollar / Credit Portal",
+      "keywords": ["money", "amount", "paid", "payment", "draw", "wire", "credit", "advance", "deposit", "reimbursement"],
+      "depends_on": ["identity_firewall", "timeline_knowledge"],
+      "opens": ["contract_scope", "authorization", "bridge_records"]
+    },
+    "contract_scope": {
+      "name": "Contract Baseline / Change / Delivery Portal",
+      "keywords": ["contract", "repc", "budget", "scope", "change order", "included", "delivered", "overage", "allowance"],
+      "depends_on": ["source_integrity", "identity_firewall"],
+      "opens": ["authorization", "claim_drift", "money_flow"]
+    },
+    "authorization": {
+      "name": "Visibility / Signature / Authorization Portal",
+      "keywords": ["signature", "signed", "authorization", "owner seen", "docusign", "forged", "unauthorized"],
+      "depends_on": ["source_integrity", "identity_firewall", "timeline_knowledge"],
+      "opens": ["bridge_records", "legal_elements"]
+    },
+    "claim_drift": {
+      "name": "Claim / Label / Version Drift Portal",
+      "keywords": ["changed", "reclassified", "label", "version", "later explanation", "different total", "budget lineage"],
+      "depends_on": ["source_integrity", "timeline_knowledge"],
+      "opens": ["contradiction", "bridge_records"]
+    },
+    "contradiction": {
+      "name": "Typed Contradiction / Compatibility Portal",
+      "keywords": ["contradiction", "conflict", "inconsistent", "versus", "different"],
+      "depends_on": ["claim_drift"],
+      "opens": ["alternative_explanations", "bridge_records"]
+    },
+    "alternative_explanations": {
+      "name": "Alternative Explanation / Falsification Portal",
+      "keywords": ["mistake", "innocent", "alternative", "timing", "administrative", "reclassification", "falsification"],
+      "depends_on": ["source_integrity"],
+      "opens": []
+    },
+    "bridge_records": {
+      "name": "Expected Record / Proof Debt Portal",
+      "keywords": ["missing", "needed", "bridge", "closure", "next record"],
+      "depends_on": ["source_integrity"],
+      "opens": []
+    },
+    "legal_elements": {
+      "name": "Element-by-Element Evidence Mapping Portal",
+      "keywords": ["fraud", "rico", "breach", "intent", "reliance", "materiality", "causation", "damages"],
+      "depends_on": ["source_integrity"],
+      "opens": []
+    },
+    "entropy_health": {
+      "name": "Information Dissolution / Reconstructability Portal",
+      "keywords": ["entropy", "dissolution", "fragmentation", "reconstruct", "case health"],
+      "depends_on": ["source_integrity", "identity_firewall", "bridge_records"],
+      "opens": []
+    }
+  }
+}
