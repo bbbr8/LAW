@@ -1,0 +1,49 @@
+{
+  "records": [
+    {
+      "id": "baseline-001",
+      "source": "REPC and cost breakdown",
+      "date": "2018-02-05",
+      "speaker": "Transaction documents",
+      "recipient": "Bryce Jones",
+      "source_tier": "F0",
+      "text": "Signed construction baseline stated $791,456 excluding the $235,000 land component. Later materials used a $1,339,826 budget, creating a $1,104,826 construction figure after removing land."
+    },
+    {
+      "id": "pivot-001",
+      "source": "Pre-commitment communication review target",
+      "date": "2018-02-01",
+      "speaker": "Jeff / Colby / Suited lane",
+      "recipient": "Bryce Jones",
+      "source_tier": "Open",
+      "text": "Record needed explaining why Bryce chose the Jeff / Colby / Suited transaction instead of the home he was already buying, including cost, value, risk, financing, and investment pitch representations."
+    },
+    {
+      "id": "draw-002",
+      "source": "Draw 2 package",
+      "date": "2018-05-24",
+      "speaker": "Draw submission",
+      "recipient": "Funds control / lender",
+      "source_tier": "F1",
+      "text": "Draw 2 requested $237,125.77. Review needed for borrower authorization, signature method, vendor support, payment proof, and any owner-paid overlap."
+    },
+    {
+      "id": "owner-credit-001",
+      "source": "Owner payment ledger",
+      "date": "2018-05-17",
+      "speaker": "Owner payment record",
+      "recipient": "Project / builder accounting",
+      "source_tier": "F1",
+      "text": "Bryce paid $55,000 as an owner payment. The issue is whether this was treated as reimbursement / credit or later converted into separate owner-paid debt without reconciliation."
+    },
+    {
+      "id": "statement-001",
+      "source": "Deposition / statement lane",
+      "date": "2025-01-01",
+      "speaker": "Adverse witness",
+      "recipient": "Litigation record",
+      "source_tier": "F1",
+      "text": "Claimed Bryce wanted upgrades and a nicer home. Record response requires itemized signed change orders, owner approvals, invoices, proof of payment, and credit schedule before converting preference into financial authorization."
+    }
+  ]
+}
