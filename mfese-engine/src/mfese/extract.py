@@ -10,13 +10,17 @@ import fitz
 from .schemas import DocumentRole, ExtractedItem
 
 
-_AMOUNT_RE = re.compile(r"(?<![A-Za-z0-9])\$?\(?\s*((?:\d{1,3}(?:,\d{3})+)|\d+)(?:\.(\d{2}))?\s*\)?")
+_AMOUNT_RE = re.compile(r"(?<![A-Za-z0-9])\$?\(?\s*((?:\d{1,3}(?:,\d{3})+)|\d+)(?:\.(\d{1,2}))?\s*\)?")
 _DATE_RE = re.compile(r"\b(?:0?[1-9]|1[0-2])[-/](?:0?[1-9]|[12]\d|3[01])[-/](?:\d{2}|\d{4})\b")
 _ISO_DATE_RE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 _ENVELOPE_RE = re.compile(r"\b[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}\b", re.I)
 _INVOICE_RE = re.compile(r"\b(?:invoice\s*(?:no\.?|number|#)?\s*)?([A-Z0-9]{4,}(?:-[A-Z0-9]{2,})+)\b", re.I)
 _ACCOUNT_RE = re.compile(r"\b(?:account|acct\.?|loan)\s*(?:no\.?|number|#)?\s*[:#]?\s*([0-9]{6,})\b", re.I)
-_ADDRESS_RE = re.compile(r"\b\d{2,6}\s+(?:[NSEW]\.?\s+)?\d{1,5}\s+(?:[NSEW]\.?|North|South|East|West)\b[^\n,]{0,45}", re.I)
+_ADDRESS_RE = re.compile(
+    r"\b\d{2,6}\s+(?:[NSEW]\.?\s+)?\d{1,5}\s+(?:[NSEW]\.?|North|South|East|West)\b[^\n,]{0,45}",
+    re.I,
+)
+
 
 ROLE_RULES: list[tuple[DocumentRole, tuple[str, ...], float]] = [
     (DocumentRole.DRAW_REQUEST, ("draw request", "amount requested", "construction loan administration"), 1.0),
@@ -74,7 +78,20 @@ def classify_role(text: str, filename: str, hint: DocumentRole | None = None) ->
     ]
 
 
-def _money_value(match: re.Match[str]) -> float | None:
+MONEY_CONTEXT_TERMS = (
+    "total", "amount", "price", "requested", "request", "subtotal", "budget", "invoice",
+    "paid", "payment", "cost", "balance", "allowance", "contingency", "cabinet", "cabinetry",
+    "framing", "flatwork", "footing", "foundation", "permit", "excavation", "plumbing",
+    "flooring", "fireplace", "window", "door", "roof", "trim", "hardware", "appliance",
+    "landscaping", "electrical", "drywall", "insulation", "countertop", "damp", "slab",
+)
+ADDRESS_CONTEXT_TERMS = (
+    "street", "st.", "road", "rd.", "drive", "dr.", "lane", "ln.", "avenue", "ave.",
+    "mapleton", "pleasant grove", "ut ", "zip", "ship to", "sold to", "bill to", "po box",
+)
+
+
+def _money_value(match: re.Match[str], line: str) -> float | None:
     whole, cents = match.group(1), match.group(2)
     try:
         value = float(whole.replace(",", "") + (f".{cents}" if cents else ""))
@@ -83,7 +100,17 @@ def _money_value(match: re.Match[str]) -> float | None:
     if value < 1:
         return None
     token = match.group(0)
-    if 1900 <= value <= 2100 and "$" not in token and "," not in token and cents is None:
+    lower = line.lower()
+    explicit_money_format = "$" in token or "," in token or cents is not None
+    money_context = any(term in lower for term in MONEY_CONTEXT_TERMS)
+    address_context = any(term in lower for term in ADDRESS_CONTEXT_TERMS)
+    if 1900 <= value <= 2100 and not explicit_money_format:
+        return None
+    if not explicit_money_format and (value < 100 or not money_context):
+        return None
+    if address_context and not money_context and "$" not in token and cents is None:
+        return None
+    if value.is_integer() and 10000 <= value <= 99999 and address_context and not money_context:
         return None
     return value
 
@@ -91,10 +118,11 @@ def _money_value(match: re.Match[str]) -> float | None:
 def extract_items(text: str, pages: list[str]) -> list[ExtractedItem]:
     items: list[ExtractedItem] = []
     for page_number, page_text in enumerate(pages, start=1):
-        for match in _AMOUNT_RE.finditer(page_text):
-            value = _money_value(match)
-            if value is not None:
-                items.append(ExtractedItem(kind="amount", value=value, normalized=f"{value:.2f}", page=page_number, source_method="regex_text"))
+        for line in page_text.splitlines():
+            for match in _AMOUNT_RE.finditer(line):
+                value = _money_value(match, line)
+                if value is not None:
+                    items.append(ExtractedItem(kind="amount", value=value, normalized=f"{value:.2f}", page=page_number, source_method="regex_money_context"))
         for match in _DATE_RE.finditer(page_text):
             items.append(ExtractedItem(kind="date", value=match.group(0), normalized=match.group(0), page=page_number, source_method="regex_text"))
         for match in _ISO_DATE_RE.finditer(page_text):
