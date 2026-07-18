@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mfese"
+version = "0.1.0"
+description = "Multimodal Forensic Evidence Synthesis Engine"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = [
+  "PyMuPDF>=1.24",
+  "numpy>=1.26",
+  "opencv-python-headless>=4.9",
+  "Pillow>=10",
+  "pydantic>=2.7",
+  "scikit-image>=0.23",
+  "scikit-learn>=1.4",
+  "networkx>=3.2",
+  "PyYAML>=6.0",
+  "typer>=0.12",
+]
+
+[project.optional-dependencies]
+hf = ["transformers>=4.49", "torch>=2.2", "sentence-transformers>=3.0"]
+space = ["gradio>=5.0"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+mfese = "mfese.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mfese"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
