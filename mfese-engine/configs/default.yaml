@@ -1,0 +1,9 @@
+matter_id: synthetic-private-matter
+privacy_mode: local_private
+render_dpi: 150
+enable_hf_lanes: []
+sources: []
+known_events: []
+exact_sum_tasks: []
+notes: >-
+  Add source paths locally. Do not commit private evidence manifests to a public repository.
