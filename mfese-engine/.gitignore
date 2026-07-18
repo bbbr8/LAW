@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
+*.webp
+mfese-output/
+private-manifests/
+.DS_Store
