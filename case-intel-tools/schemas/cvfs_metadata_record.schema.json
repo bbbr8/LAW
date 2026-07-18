@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/cvfs_metadata_record.schema.json",
+  "title": "CVFS Metadata Record",
+  "type": "object",
+  "required": ["record_type", "source_locator", "boundary"],
+  "properties": {
+    "record_type": {
+      "enum": ["document", "page", "embedded_image", "font", "error"]
+    },
+    "source_locator": {"type": "string", "minLength": 1},
+    "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "document_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "page_number": {"type": "integer", "minimum": 1},
+    "page_mode": {
+      "enum": [
+        "hybrid_full_page_image_plus_text",
+        "scan_only_or_raster_page",
+        "native_or_vector_text",
+        "sparse_or_blank"
+      ]
+    },
+    "metadata": {"type": "object"},
+    "pdf_token_counts": {
+      "type": "object",
+      "additionalProperties": {"type": "integer", "minimum": 0}
+    },
+    "raster": {
+      "type": "object",
+      "properties": {
+        "phash": {"type": "string"},
+        "dhash": {"type": "string"},
+        "raster_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "entropy": {"type": "number"},
+        "edge_density": {"type": "number", "minimum": 0, "maximum": 1},
+        "laplacian_variance": {"type": "number", "minimum": 0}
+      },
+      "additionalProperties": true
+    },
+    "text_layer": {
+      "type": "object",
+      "properties": {
+        "text_chars": {"type": "integer", "minimum": 0},
+        "invisible_like_text_chars": {"type": "integer", "minimum": 0},
+        "duplicate_span_placements": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": true
+    },
+    "embedded_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "hf_local_routes_not_executed": {"type": "object"},
+    "boundary": {"type": "string", "minLength": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"record_type": {"const": "document"}}},
+      "then": {"required": ["source_sha256", "metadata", "pdf_token_counts"]}
+    },
+    {
+      "if": {"properties": {"record_type": {"const": "page"}}},
+      "then": {"required": ["document_sha256", "page_number", "page_mode", "raster", "text_layer"]}
+    }
+  ],
+  "additionalProperties": true
+}
