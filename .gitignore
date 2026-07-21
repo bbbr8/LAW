@@ -1,5 +1,9 @@
 node_modules
 client/node_modules
+.artifacts/
+.venv/
+__pycache__/
+*.py[cod]
 server/upload-dir/*
 !server/upload-dir/.gitkeep
 server/database.sqlite
