@@ -40,7 +40,7 @@ python research/case_vision_lab/retroactive_cv_router.py \
   --db .artifacts/case_vision_eval.sqlite3 observe \
   --source-hash SHA256_OF_LOCAL_PAGE \
   --model HURIDOCS/pdf-document-layout-analysis \
-  --revision PINNED_COMMIT_OR_TAG \
+  --revision IMMUTABLE_40_CHARACTER_COMMIT_SHA \
   --task layout_region \
   --document-type construction_invoice \
   --label line_item_table \
@@ -63,15 +63,43 @@ python research/case_vision_lab/retroactive_cv_router.py \
   --db .artifacts/case_vision_eval.sqlite3 report
 ```
 
+The CLI rejects mutable tags, branch names, missing revisions, and malformed
+source or anchor hashes. Revisions must be full 40-character commit SHAs and
+source anchors must be SHA-256 hex digests, canonicalized to lowercase.
+
 ## Candidate model adapters
 
-The lab does not bundle model weights. Candidate adapters should pin an immutable model revision and record the license, task, input normalization, confidence threshold, and execution environment.
+The lab does not bundle model weights. Every declared adapter is recorded in
+`model_adapters.json`, and `model_adapters.py` rejects missing or mutable
+revisions and incomplete privacy or promotion policy. Revisions were resolved
+from the model repositories on 2026-07-21.
 
-- [HURIDOCS/pdf-document-layout-analysis](https://huggingface.co/HURIDOCS/pdf-document-layout-analysis)
-- [Oblix/yolov10m-doclaynet_ONNX_document-layout-analysis](https://huggingface.co/Oblix/yolov10m-doclaynet_ONNX_document-layout-analysis)
-- [pascalrai/Deformable-DETR-Document-Layout-Analysis](https://huggingface.co/pascalrai/Deformable-DETR-Document-Layout-Analysis)
+| Candidate | Immutable revision | License posture | Threshold |
+| --- | --- | --- | ---: |
+| [HURIDOCS/pdf-document-layout-analysis](https://huggingface.co/HURIDOCS/pdf-document-layout-analysis) | `d67bff2431df3584a114ac9e82d5c77ced364c4f` | Apache-2.0 | 0.85 |
+| [Oblix/yolov10m-doclaynet_ONNX_document-layout-analysis](https://huggingface.co/Oblix/yolov10m-doclaynet_ONNX_document-layout-analysis) | `ded498025f9b377ebb079bb6984c46967ada1505` | Not declared; license review required | 0.35 |
+| [pascalrai/Deformable-DETR-Document-Layout-Analysis](https://huggingface.co/pascalrai/Deformable-DETR-Document-Layout-Analysis) | `7e0570a0d7b072bf7c6ecb6ce5da59284d9952e5` | Apache-2.0 | 0.50 |
 
 A candidate is not approved merely because it has a high public benchmark score. It must be tested against the synthetic degradation matrix and then validated locally on source-authorized derivatives under the existing evidence controls.
+
+## Synthetic control benchmark
+
+The reproducible control benchmark generates only fictional pages. It checks
+all image hashes, manifest privacy labels, same-seed image determinism, adapter
+revision pins, and the true-positive, false-positive, false-negative, and
+unresolved retroactive routes.
+
+```bash
+python -m pip install pillow
+python -m research.case_vision_lab.synthetic_benchmark \
+  --output .artifacts/case_vision_benchmark \
+  --count 25 \
+  --seed 20260718
+```
+
+This is an evaluation-pipeline control benchmark. It does not download or
+execute third-party model weights and must not be represented as model-quality
+evidence. See `BENCHMARK_RESULTS.md` for the executed run and its limitations.
 
 ## Retroactive learning loop
 

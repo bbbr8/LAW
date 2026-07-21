@@ -17,6 +17,7 @@ import argparse
 import hashlib
 import json
 import math
+import re
 import sqlite3
 import statistics
 import sys
@@ -27,6 +28,8 @@ from typing import Any, Iterable, Mapping, Sequence
 
 SCHEMA_VERSION = "1.0"
 ABSTAIN_LABELS = {"", "abstain", "unknown", "unresolved", "needs_review"}
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+COMMIT_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
 def utc_now() -> str:
@@ -54,6 +57,20 @@ def clamp_confidence(value: float) -> float:
     if value < 0.0 or value > 1.0:
         raise ValueError("confidence must be in [0, 1]")
     return float(value)
+
+
+def require_sha256(value: str, *, field: str) -> str:
+    normalized = value.strip().lower()
+    if not SHA256_RE.fullmatch(normalized):
+        raise ValueError(f"{field} must be a 64-character SHA-256 hex digest")
+    return normalized
+
+
+def require_immutable_revision(value: str) -> str:
+    normalized = value.strip().lower()
+    if not COMMIT_SHA_RE.fullmatch(normalized):
+        raise ValueError("model_revision must be an immutable 40-character commit SHA")
+    return normalized
 
 
 @dataclass(frozen=True)
@@ -177,6 +194,8 @@ class VisionEvalStore:
     ) -> Observation:
         created_at = created_at or utc_now()
         confidence = clamp_confidence(confidence)
+        source_hash = require_sha256(source_hash, field="source_hash")
+        model_revision = require_immutable_revision(model_revision)
         features = dict(features or {})
         normalized_region = self._validate_region(region)
         identity = {
@@ -238,7 +257,7 @@ class VisionEvalStore:
             "observation_id": observation_id,
             "resolved_label": resolved_label.strip(),
             "relation": relation.strip(),
-            "anchor_hash": anchor_hash.strip(),
+            "anchor_hash": require_sha256(anchor_hash, field="anchor_hash"),
             "reviewer": reviewer.strip(),
             "notes": notes.strip(),
             "created_at": created_at,
@@ -437,7 +456,7 @@ def build_parser() -> argparse.ArgumentParser:
     observe = sub.add_parser("observe")
     observe.add_argument("--source-hash", required=True)
     observe.add_argument("--model", required=True)
-    observe.add_argument("--revision", default="unknown")
+    observe.add_argument("--revision", required=True)
     observe.add_argument("--task", required=True)
     observe.add_argument("--document-type", default="unknown")
     observe.add_argument("--label", required=True)

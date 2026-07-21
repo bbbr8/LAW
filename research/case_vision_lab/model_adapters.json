@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "revisions_verified_on": "2026-07-21",
+  "promotion_policy": {
+    "automatic_fact_promotion": false,
+    "human_review_required": true,
+    "exact_source_anchor_required": true,
+    "native_case_data_allowed_in_repository": false
+  },
+  "adapters": [
+    {
+      "model_id": "HURIDOCS/pdf-document-layout-analysis",
+      "revision": "d67bff2431df3584a114ac9e82d5c77ced364c4f",
+      "task": "document-layout-analysis",
+      "runtime": "pinned external service candidate",
+      "license": "apache-2.0",
+      "input_normalization": "PDF page rendering and service-side normalization; verify locally before use",
+      "confidence_threshold": 0.85,
+      "license_review_required": false,
+      "promotion_rule": "Output remains a derived candidate until human review confirms an exact native source anchor."
+    },
+    {
+      "model_id": "Oblix/yolov10m-doclaynet_ONNX_document-layout-analysis",
+      "revision": "ded498025f9b377ebb079bb6984c46967ada1505",
+      "task": "object-detection",
+      "runtime": "Transformers.js ONNX candidate",
+      "license": "not-declared-in-model-card",
+      "input_normalization": "AutoProcessor resize and normalization with bounding boxes rescaled to source image dimensions",
+      "confidence_threshold": 0.35,
+      "license_review_required": true,
+      "promotion_rule": "Detected regions remain derived candidates and cannot establish document meaning or a case fact."
+    },
+    {
+      "model_id": "pascalrai/Deformable-DETR-Document-Layout-Analysis",
+      "revision": "7e0570a0d7b072bf7c6ecb6ce5da59284d9952e5",
+      "task": "object-detection",
+      "runtime": "Transformers Deformable DETR candidate",
+      "license": "apache-2.0",
+      "input_normalization": "AutoImageProcessor with post-processing to original source image dimensions",
+      "confidence_threshold": 0.5,
+      "license_review_required": false,
+      "promotion_rule": "Detected regions remain derived candidates until exact source anchoring and human review."
+    }
+  ]
+}
